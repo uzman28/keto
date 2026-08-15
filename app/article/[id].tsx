@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Screen } from '../../src/components/Screen';
 import { articles } from '../../src/data/articles';
 import { colors, radius, spacing, typography } from '../../src/theme';
 
@@ -20,7 +21,7 @@ export default function ArticleDetailScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.content} style={styles.screen}>
+    <Screen contentStyle={styles.content} withBottomInset>
       <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
         <Text style={styles.backText}>‹ Geri</Text>
       </Pressable>
@@ -37,7 +38,7 @@ export default function ArticleDetailScreen() {
           ),
         )}
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
 
@@ -46,12 +47,12 @@ const styles = StyleSheet.create({
   backText: { color: colors.accent, fontSize: typography.body, fontWeight: '700' },
   body: { gap: spacing.md, marginTop: spacing.lg },
   category: { color: colors.accent, fontSize: typography.small, fontWeight: '700', letterSpacing: 1, marginTop: spacing.md },
-  content: { padding: spacing.xl, paddingBottom: spacing.xxl },
+  // Bu ekranda boşluklar tek tek marginTop ile veriliyor, Screen'in varsayılan gap'ini kapatıyoruz.
+  content: { gap: 0 },
   emptyState: { alignItems: 'center', backgroundColor: colors.background, flex: 1, gap: spacing.lg, justifyContent: 'center', padding: spacing.xl },
   emptyTitle: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
   paragraph: { color: colors.text, fontSize: typography.body, lineHeight: 25 },
   readTime: { color: colors.textMuted, fontSize: typography.small, marginTop: spacing.sm },
-  screen: { backgroundColor: colors.background },
   subtitle: { color: colors.text, fontSize: typography.section, fontWeight: '700', marginTop: spacing.md },
   title: { color: colors.text, fontSize: typography.heading, fontWeight: '700', lineHeight: 37, marginTop: spacing.sm },
 });

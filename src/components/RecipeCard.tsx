@@ -7,6 +7,7 @@ import type { MealType, Recipe } from '../types';
 interface RecipeCardProps {
   isFavorite: boolean;
   onFavoritePress: () => void;
+  onPress: () => void;
   recipe: Recipe;
 }
 
@@ -26,9 +27,13 @@ const mealIcons: Record<MealType, 'cafe-outline' | 'fish-outline' | 'leaf-outlin
   tatli: 'sparkles-outline',
 };
 
-export function RecipeCard({ isFavorite, onFavoritePress, recipe }: RecipeCardProps) {
+export function RecipeCard({ isFavorite, onFavoritePress, onPress, recipe }: RecipeCardProps) {
   return (
-    <View style={styles.card}>
+    <Pressable
+      accessibilityLabel={`${recipe.title} tarifini aç`}
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
       <View style={styles.imageContainer}>
         <Image
           accessibilityLabel={`${recipe.title} görseli`}
@@ -36,6 +41,8 @@ export function RecipeCard({ isFavorite, onFavoritePress, recipe }: RecipeCardPr
           source={recipe.image}
           style={styles.image}
         />
+        {/* Açık renkli yemek fotoğraflarında üstteki beyaz yazının okunabilmesi için koyu perde. */}
+        <View pointerEvents="none" style={styles.scrim} />
         <View pointerEvents="none" style={styles.imageContent}>
           <View style={styles.iconCircle}>
             <Ionicons color={colors.text} name={mealIcons[recipe.mealType]} size={30} />
@@ -67,7 +74,7 @@ export function RecipeCard({ isFavorite, onFavoritePress, recipe }: RecipeCardPr
           </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -76,6 +83,7 @@ const styles = StyleSheet.create({
   carbBadge: { backgroundColor: colors.accentSurface, borderRadius: radius.pill, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs },
   carbText: { color: colors.accent, fontSize: typography.small, fontWeight: '700' },
   card: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, overflow: 'hidden' },
+  cardPressed: { opacity: 0.85 },
   heartPressed: { opacity: 0.6 },
   iconCircle: { alignItems: 'center', backgroundColor: colors.accentSurface, borderColor: colors.border, borderRadius: radius.pill, borderWidth: 1, height: 54, justifyContent: 'center', width: 54 },
   image: { height: '100%', width: '100%' },
@@ -84,6 +92,7 @@ const styles = StyleSheet.create({
   mealLabel: { color: colors.text, fontSize: typography.small, fontWeight: '800', letterSpacing: 1, marginTop: spacing.sm },
   meta: { color: colors.textMuted, fontSize: typography.small },
   metaRow: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  scrim: { backgroundColor: 'rgba(0, 0, 0, 0.35)', bottom: 0, left: 0, position: 'absolute', right: 0, top: 0 },
   title: { color: colors.text, flex: 1, fontSize: typography.section, fontWeight: '700', lineHeight: 26 },
   titleRow: { alignItems: 'flex-start', flexDirection: 'row', gap: spacing.sm },
 });

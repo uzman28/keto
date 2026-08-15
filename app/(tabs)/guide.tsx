@@ -1,16 +1,94 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { colors, typography } from '../../src/theme';
+import { FilterChip } from '../../src/components/FilterChip';
+import { Screen } from '../../src/components/Screen';
+import { articles } from '../../src/data/articles';
+import { colors, radius, spacing, typography } from '../../src/theme';
+import type { Article } from '../../src/types';
+
+type CategoryFilter = 'all' | Article['category'];
+
+const categoryFilters: Array<{ label: string; value: CategoryFilter }> = [
+  { label: 'Tümü', value: 'all' },
+  { label: 'Temel', value: 'temel' },
+  { label: 'Başlangıç', value: 'baslangic' },
+  { label: 'Beslenme', value: 'beslenme' },
+  { label: 'Sorun çözme', value: 'sorun-cozme' },
+];
+
+const categoryLabels: Record<Article['category'], string> = {
+  baslangic: 'BAŞLANGIÇ',
+  beslenme: 'BESLENME',
+  'sorun-cozme': 'SORUN ÇÖZME',
+  temel: 'TEMEL',
+};
 
 export default function GuideScreen() {
+  const [category, setCategory] = useState<CategoryFilter>('all');
+
+  const filteredArticles = useMemo(
+    () => (category === 'all' ? articles : articles.filter((item) => item.category === category)),
+    [category],
+  );
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Rehber</Text>
-    </View>
+    <Screen>
+      <View style={styles.heading}>
+        <Text style={styles.title}>Rehber</Text>
+        <Text style={styles.subtitle}>Keto hakkında bilmen gerekenler, kısa yazılar halinde.</Text>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.chipScrollContent}
+        style={styles.chipScroller}>
+        {categoryFilters.map((filter) => (
+          <FilterChip
+            key={filter.value}
+            label={filter.label}
+            onPress={() => setCategory(filter.value)}
+            selected={category === filter.value}
+          />
+        ))}
+      </ScrollView>
+
+      <View style={styles.list}>
+        {filteredArticles.map((article) => (
+          <Pressable
+            key={article.id}
+            accessibilityRole="button"
+            onPress={() => router.push({ pathname: '/article/[id]', params: { id: article.id } })}
+            style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}>
+            <View style={styles.cardTopRow}>
+              <Text style={styles.category}>{categoryLabels[article.category]}</Text>
+              <Text style={styles.readTime}>{article.readMin} dk</Text>
+            </View>
+            <Text style={styles.cardTitle}>{article.title}</Text>
+            <Text style={styles.cardSummary}>{article.summary}</Text>
+            <Text style={styles.link}>Oku →</Text>
+          </Pressable>
+        ))}
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { alignItems: 'center', backgroundColor: colors.background, flex: 1, justifyContent: 'center' },
+  card: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.sm, padding: spacing.lg },
+  cardPressed: { opacity: 0.85 },
+  cardSummary: { color: colors.textMuted, fontSize: typography.body, lineHeight: 23 },
+  cardTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700', lineHeight: 27 },
+  cardTopRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
+  category: { color: colors.accent, fontSize: typography.small, fontWeight: '800', letterSpacing: 1 },
+  chipScrollContent: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.xl },
+  chipScroller: { marginHorizontal: -spacing.xl },
+  heading: { gap: spacing.xs },
+  link: { color: colors.accent, fontSize: typography.small, fontWeight: '700', marginTop: spacing.xs },
+  list: { gap: spacing.md },
+  readTime: { color: colors.textMuted, fontSize: typography.small },
+  subtitle: { color: colors.textMuted, fontSize: typography.body, lineHeight: 23 },
   title: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
 });

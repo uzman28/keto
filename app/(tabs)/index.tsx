@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { MacroCard } from '../../src/components/MacroCard';
+import { Screen } from '../../src/components/Screen';
 import { articles } from '../../src/data/articles';
 import { calculateMacros } from '../../src/macros';
 import { useProfile } from '../../src/profile-context';
@@ -26,7 +27,7 @@ export default function HomeScreen() {
   const dailyTip = articles[getDayOfYear(new Date()) % articles.length];
 
   return (
-    <ScrollView contentContainerStyle={styles.content} style={styles.screen}>
+    <Screen>
       <View style={styles.heading}>
         <Text style={styles.greeting}>Merhaba</Text>
         <Text style={styles.summary}>Günlük hedefin</Text>
@@ -60,7 +61,7 @@ export default function HomeScreen() {
       </Pressable>
 
       <Text style={styles.disclaimer}>{disclaimer}</Text>
-    </ScrollView>
+    </Screen>
   );
 }
 
@@ -76,12 +77,10 @@ const styles = StyleSheet.create({
   calorieLabel: { color: colors.textMuted, fontSize: typography.small, fontWeight: '700', letterSpacing: 1 },
   calorieUnit: { color: colors.textMuted, fontSize: typography.body },
   calorieValue: { color: colors.text, fontSize: typography.display, fontWeight: '800', lineHeight: 66, marginTop: spacing.xs },
-  content: { gap: spacing.xl, padding: spacing.xl, paddingBottom: spacing.xxl },
   disclaimer: { color: colors.textMuted, fontSize: typography.small, lineHeight: 19, textAlign: 'center' },
   greeting: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
   heading: { gap: spacing.xs },
   macroRow: { flexDirection: 'row', gap: spacing.sm },
-  screen: { backgroundColor: colors.background },
   summary: { color: colors.textMuted, fontSize: typography.body },
   tipCard: { backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.sm, padding: spacing.lg },
   tipCardPressed: { opacity: 0.8 },

@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { NumberInput } from '../src/components/NumberInput';
 import { SelectableOption } from '../src/components/SelectableOption';
@@ -41,6 +42,7 @@ function numberError(value: string, label: string, min: number, max: number, int
 
 export default function OnboardingScreen() {
   const { profile, updateProfile } = useProfile();
+  const insets = useSafeAreaInsets();
   const [gender, setGender] = useState<Gender | null>(profile?.gender ?? null);
   const [age, setAge] = useState(profile ? String(profile.age) : '');
   const [heightCm, setHeightCm] = useState(profile ? String(profile.heightCm) : '');
@@ -85,7 +87,12 @@ export default function OnboardingScreen() {
     <KeyboardAvoidingView
       behavior={Platform.select({ ios: 'padding', default: undefined })}
       style={styles.keyboardView}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: insets.top + spacing.xl, paddingBottom: insets.bottom + spacing.xxl },
+        ]}
+        keyboardShouldPersistTaps="handled">
         <Text style={styles.eyebrow}>KETOYA HOŞ GELDİN</Text>
         <Text style={styles.title}>Günlük hedeflerini hesaplayalım</Text>
         <Text style={styles.intro}>Bilgilerin yalnızca bu cihazda saklanır.</Text>
@@ -162,7 +169,7 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.xl, padding: spacing.xl, paddingBottom: spacing.xxl },
+  content: { gap: spacing.xl, paddingHorizontal: spacing.xl },
   error: { color: colors.danger, fontSize: typography.small, marginTop: spacing.xs },
   eyebrow: { color: colors.accent, fontSize: typography.small, fontWeight: '700', letterSpacing: 1.2 },
   genderButton: { alignItems: 'center', borderRadius: radius.sm, flex: 1, padding: spacing.md },
