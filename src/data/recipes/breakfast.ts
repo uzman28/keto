@@ -1,0 +1,58 @@
+import type { Recipe } from '../../types';
+
+export const breakfastRecipes: Recipe[] = [
+  {
+    id: 'menemen',
+    title: 'Kaşarlı Menemen',
+    image: require('../../../assets/recipes/menemen.png'),
+    mealType: 'kahvalti',
+    prepMin: 15,
+    servings: 1,
+    macrosPerServing: { kcal: 390, fatG: 29, proteinG: 24, netCarbG: 5 },
+    ingredients: [
+      { name: 'Yumurta', amount: 2, unit: 'adet' },
+      { name: 'Domates', amount: 100, unit: 'g' },
+      { name: 'Yeşil biber', amount: 50, unit: 'g' },
+      { name: 'Kaşar peyniri', amount: 40, unit: 'g' },
+      { name: 'Tereyağı', amount: 10, unit: 'g' },
+      { name: 'Tuz ve karabiber', amount: 1, unit: 'çay kaşığı' },
+    ],
+    steps: ['Tereyağını tavada eritin, doğranmış biberi 2 dakika çevirin.', 'Domatesi ekleyip suyunu hafifçe çekene kadar pişirin.', 'Yumurtaları kırın, karıştırın ve kaşarı ekleyin.', 'Kıvamı istediğiniz noktaya gelince sıcak servis edin.'],
+    tips: 'Domatesin suyunu tamamen çektirmeyin; daha yumuşak bir menemen elde edersiniz.',
+  },
+  {
+    id: 'kasarli-omlet',
+    title: 'Kaşarlı Otlu Omlet',
+    image: require('../../../assets/recipes/kasarli-omlet.png'),
+    mealType: 'kahvalti',
+    prepMin: 10,
+    servings: 1,
+    macrosPerServing: { kcal: 500, fatG: 40, proteinG: 31, netCarbG: 3 },
+    ingredients: [
+      { name: 'Yumurta', amount: 3, unit: 'adet' },
+      { name: 'Kaşar peyniri', amount: 60, unit: 'g' },
+      { name: 'Tereyağı', amount: 10, unit: 'g' },
+      { name: 'Maydanoz', amount: 10, unit: 'g' },
+      { name: 'Tuz ve karabiber', amount: 1, unit: 'çay kaşığı' },
+    ],
+    steps: ['Yumurtaları baharat ve ince kıyılmış maydanozla çırpın.', 'Tereyağını orta ateşte eritin.', 'Yumurtayı tavaya alın, kaşarı yarısına yayın.', 'Omleti kapatın ve peynir eriyene kadar pişirin.'],
+  },
+  {
+    id: 'avokadolu-yumurta',
+    title: 'Avokadolu Yumurta Tabağı',
+    image: require('../../../assets/recipes/avokadolu-yumurta.png'),
+    mealType: 'kahvalti',
+    prepMin: 12,
+    servings: 1,
+    macrosPerServing: { kcal: 350, fatG: 31, proteinG: 18, netCarbG: 4 },
+    ingredients: [
+      { name: 'Yumurta', amount: 2, unit: 'adet' },
+      { name: 'Avokado', amount: 100, unit: 'g' },
+      { name: 'Beyaz peynir', amount: 30, unit: 'g' },
+      { name: 'Zeytinyağı', amount: 5, unit: 'g' },
+      { name: 'Limon suyu', amount: 1, unit: 'yemek kaşığı' },
+    ],
+    steps: ['Yumurtaları istediğiniz kıvamda haşlayın.', 'Avokadoyu dilimleyip limon suyuyla karıştırın.', 'Peynir, yumurta ve avokadoyu tabağa alın.', 'Zeytinyağını gezdirip servis edin.'],
+    tips: 'Avokadonun kararmaması için limon suyunu hazırladığınız anda ekleyin.',
+  },
+];

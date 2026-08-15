@@ -1,0 +1,57 @@
+import type { Recipe } from '../../types';
+
+export const dinnerRecipes: Recipe[] = [
+  {
+    id: 'tavuk-sote',
+    title: 'Renkli Sebzeli Tavuk Sote',
+    image: require('../../../assets/recipes/tavuk-sote.png'),
+    mealType: 'aksam',
+    prepMin: 25,
+    servings: 2,
+    macrosPerServing: { kcal: 520, fatG: 38, proteinG: 46, netCarbG: 8 },
+    ingredients: [
+      { name: 'Tavuk but kuşbaşı', amount: 400, unit: 'g' },
+      { name: 'Mantar', amount: 200, unit: 'g' },
+      { name: 'Kabak', amount: 200, unit: 'g' },
+      { name: 'Kapya biber', amount: 100, unit: 'g' },
+      { name: 'Zeytinyağı', amount: 30, unit: 'g' },
+      { name: 'Tuz ve baharat', amount: 1, unit: 'çay kaşığı' },
+    ],
+    steps: ['Tavuğu geniş tavada zeytinyağıyla mühürleyin.', 'Biber ve mantarı ekleyip yüksek ateşte çevirin.', 'Kabağı ve baharatları ekleyin.', 'Sebzeler yumuşayıp tavuk pişince iki porsiyon servis edin.'],
+  },
+  {
+    id: 'izgara-kofte',
+    title: 'Izgara Köfte ve Roka Salatası',
+    image: require('../../../assets/recipes/izgara-kofte.png'),
+    mealType: 'aksam',
+    prepMin: 30,
+    servings: 2,
+    macrosPerServing: { kcal: 740, fatG: 58, proteinG: 51, netCarbG: 6 },
+    ingredients: [
+      { name: 'Orta yağlı dana kıyma', amount: 500, unit: 'g' },
+      { name: 'Kuru soğan', amount: 50, unit: 'g' },
+      { name: 'Zeytinyağı', amount: 10, unit: 'g' },
+      { name: 'Roka', amount: 100, unit: 'g' },
+      { name: 'Domates', amount: 100, unit: 'g' },
+      { name: 'Kimyon ve tuz', amount: 1, unit: 'çay kaşığı' },
+    ],
+    steps: ['Kıymayı rendelenmiş soğan ve baharatla yoğurun.', 'Karışımdan eşit köfteler şekillendirin.', 'Köfteleri ızgara tavada iki yüzü kızarana kadar pişirin.', 'Roka ve domatesle iki porsiyon halinde servis edin.'],
+  },
+  {
+    id: 'somon-brokoli',
+    title: 'Fırında Somon ve Brokoli',
+    image: require('../../../assets/recipes/somon-brokoli.png'),
+    mealType: 'aksam',
+    prepMin: 28,
+    servings: 2,
+    macrosPerServing: { kcal: 600, fatG: 42, proteinG: 44, netCarbG: 6 },
+    ingredients: [
+      { name: 'Somon fileto', amount: 400, unit: 'g' },
+      { name: 'Brokoli', amount: 300, unit: 'g' },
+      { name: 'Zeytinyağı', amount: 30, unit: 'g' },
+      { name: 'Limon', amount: 0.5, unit: 'adet' },
+      { name: 'Tuz ve karabiber', amount: 1, unit: 'çay kaşığı' },
+    ],
+    steps: ['Brokoliyi küçük dallara ayırıp fırın tepsisine alın.', 'Somonu yanına yerleştirip zeytinyağı ve baharat ekleyin.', 'Limon suyunu gezdirin.', '200 derece fırında 18-20 dakika pişirip iki porsiyon servis edin.'],
+  },
+];

@@ -1,0 +1,55 @@
+import type { Recipe } from '../../types';
+
+export const snackAndDessertRecipes: Recipe[] = [
+  {
+    id: 'cacik',
+    title: 'Zeytinyağlı Cacık',
+    image: require('../../../assets/recipes/cacik.png'),
+    mealType: 'atistirmalik',
+    prepMin: 8,
+    servings: 2,
+    macrosPerServing: { kcal: 195, fatG: 15, proteinG: 8, netCarbG: 4 },
+    ingredients: [
+      { name: 'Süzme yoğurt', amount: 200, unit: 'g' },
+      { name: 'Salatalık', amount: 200, unit: 'g' },
+      { name: 'Zeytinyağı', amount: 15, unit: 'g' },
+      { name: 'Kuru nane', amount: 1, unit: 'çay kaşığı' },
+      { name: 'Tuz', amount: 0.5, unit: 'çay kaşığı' },
+    ],
+    steps: ['Salatalığı küçük küpler halinde doğrayın.', 'Yoğurt, tuz ve naneyi karıştırın.', 'Salatalığı ekleyip iki kaseye bölün.', 'Üzerine zeytinyağı gezdirin.'],
+  },
+  {
+    id: 'peynir-zeytin-tabagi',
+    title: 'Peynirli Zeytin Tabağı',
+    image: require('../../../assets/recipes/peynir-zeytin.png'),
+    mealType: 'atistirmalik',
+    prepMin: 5,
+    servings: 1,
+    macrosPerServing: { kcal: 430, fatG: 33, proteinG: 19, netCarbG: 4 },
+    ingredients: [
+      { name: 'Kaşar peyniri', amount: 60, unit: 'g' },
+      { name: 'Yeşil zeytin', amount: 50, unit: 'g' },
+      { name: 'Ceviz', amount: 20, unit: 'g' },
+      { name: 'Salatalık', amount: 100, unit: 'g' },
+    ],
+    steps: ['Peyniri küp küp doğrayın.', 'Peynir, zeytin ve cevizi tabağa alın.', 'Salatalığı dilimleyerek yanında servis edin.'],
+    tips: 'Porsiyonu önceden tabağa almak, kuruyemiş miktarını daha kolay kontrol etmenizi sağlar.',
+  },
+  {
+    id: 'kakaolu-mousse',
+    title: 'Kakaolu Keto Mousse',
+    image: require('../../../assets/recipes/kakaolu-mousse.png'),
+    mealType: 'tatli',
+    prepMin: 15,
+    servings: 2,
+    macrosPerServing: { kcal: 560, fatG: 58, proteinG: 6, netCarbG: 5 },
+    ingredients: [
+      { name: 'Sıvı krema', amount: 200, unit: 'ml' },
+      { name: 'Mascarpone', amount: 100, unit: 'g' },
+      { name: 'Şekersiz kakao', amount: 20, unit: 'g' },
+      { name: 'Eritritol', amount: 20, unit: 'g' },
+      { name: 'Vanilya özütü', amount: 0.5, unit: 'çay kaşığı' },
+    ],
+    steps: ['Soğuk kremayı koyulaşana kadar çırpın.', 'Mascarpone, kakao, eritritol ve vanilyayı ekleyin.', 'Pürüzsüz olana kadar kısa süre daha çırpın.', 'İki kaseye paylaştırıp buzdolabında en az 30 dakika dinlendirin.'],
+  },
+];
