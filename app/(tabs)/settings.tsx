@@ -33,7 +33,7 @@ export default function SettingsScreen() {
   function handleReset() {
     Alert.alert(
       'Verileri sıfırla',
-      'Profilin ve hesaplanan hedeflerin silinecek. Favori tariflerin korunur. Devam edilsin mi?',
+      'Profilin ve hesaplanan hedeflerin silinecek. Favori tariflerin ve günlük kayıtların korunur. Devam edilsin mi?',
       [
         { text: 'Vazgeç', style: 'cancel' },
         {

@@ -31,6 +31,13 @@ export interface Ingredient {
   unit: string;
 }
 
+export interface FoodMacros {
+  kcal: number;
+  fatG: number;
+  proteinG: number;
+  netCarbG: number;
+}
+
 export interface Recipe {
   id: string;
   title: string;
@@ -38,16 +45,25 @@ export interface Recipe {
   mealType: MealType;
   prepMin: number;
   servings: number;
-  macrosPerServing: {
-    kcal: number;
-    fatG: number;
-    proteinG: number;
-    netCarbG: number;
-  };
+  macrosPerServing: FoodMacros;
   ingredients: Ingredient[];
   steps: string[];
   tips?: string;
 }
+
+/** Güne eklenmiş tek bir öğün kaydı. macros porsiyonla çarpılmış toplamı tutar. */
+export interface LogEntry {
+  id: string;
+  title: string;
+  recipeId: string;
+  mealType: MealType;
+  servings: number;
+  macros: FoodMacros;
+  createdAt: string;
+}
+
+/** Tarih anahtarı ('2026-08-18') -> o günün kayıtları. */
+export type DayLog = Record<string, LogEntry[]>;
 
 export interface Article {
   id: string;

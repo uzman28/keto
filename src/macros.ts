@@ -1,4 +1,12 @@
-import type { ActivityLevel, Gender, Goal, MacroTargets, UserProfile } from './types';
+import type {
+  ActivityLevel,
+  FoodMacros,
+  Gender,
+  Goal,
+  LogEntry,
+  MacroTargets,
+  UserProfile,
+} from './types';
 
 const activityMultipliers: Record<ActivityLevel, number> = {
   sedentary: 1.2,
@@ -39,4 +47,26 @@ export function calculateMacros(profile: UserProfile): MacroTargets {
     bmr: Math.round(bmrExact),
     tdee: Math.round(tdeeExact),
   };
+}
+
+/** Porsiyon çarpanını uygular; kaydedilen değerler tam sayı olsun diye yuvarlanır. */
+export function scaleMacros(macros: FoodMacros, servings: number): FoodMacros {
+  return {
+    kcal: Math.round(macros.kcal * servings),
+    fatG: Math.round(macros.fatG * servings),
+    proteinG: Math.round(macros.proteinG * servings),
+    netCarbG: Math.round(macros.netCarbG * servings),
+  };
+}
+
+export function sumMacros(entries: LogEntry[]): FoodMacros {
+  return entries.reduce<FoodMacros>(
+    (total, entry) => ({
+      kcal: total.kcal + entry.macros.kcal,
+      fatG: total.fatG + entry.macros.fatG,
+      proteinG: total.proteinG + entry.macros.proteinG,
+      netCarbG: total.netCarbG + entry.macros.netCarbG,
+    }),
+    { kcal: 0, fatG: 0, proteinG: 0, netCarbG: 0 },
+  );
 }

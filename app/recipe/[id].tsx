@@ -1,13 +1,18 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { FilterChip } from '../../src/components/FilterChip';
 import { Screen } from '../../src/components/Screen';
+import { getDateKey } from '../../src/date';
 import { recipes } from '../../src/data/recipes';
-import { getFavorites, toggleFavorite } from '../../src/storage';
+import { scaleMacros } from '../../src/macros';
+import { addLogEntry, createEntryId, getFavorites, toggleFavorite } from '../../src/storage';
 import { colors, radius, spacing, typography } from '../../src/theme';
 import type { MealType } from '../../src/types';
+
+const servingOptions = [0.5, 1, 1.5, 2];
 
 const mealLabels: Record<MealType, string> = {
   aksam: 'AKŞAM YEMEĞİ',
@@ -21,6 +26,9 @@ export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const recipe = recipes.find((item) => item.id === id);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [servings, setServings] = useState(1);
+  const [justAdded, setJustAdded] = useState(false);
+  const addedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     async function loadFavorite() {
@@ -30,6 +38,12 @@ export default function RecipeDetailScreen() {
 
     void loadFavorite();
   }, [id]);
+
+  useEffect(() => () => {
+    if (addedTimer.current) {
+      clearTimeout(addedTimer.current);
+    }
+  }, []);
 
   if (!recipe) {
     return (
@@ -47,7 +61,31 @@ export default function RecipeDetailScreen() {
     setIsFavorite(favorites.includes(id));
   }
 
+  async function handleAddToDay() {
+    if (!recipe) {
+      return;
+    }
+
+    await addLogEntry(getDateKey(), {
+      id: createEntryId(),
+      title: recipe.title,
+      recipeId: recipe.id,
+      mealType: recipe.mealType,
+      servings,
+      macros: scaleMacros(recipe.macrosPerServing, servings),
+      createdAt: new Date().toISOString(),
+    });
+
+    setJustAdded(true);
+
+    if (addedTimer.current) {
+      clearTimeout(addedTimer.current);
+    }
+    addedTimer.current = setTimeout(() => setJustAdded(false), 2500);
+  }
+
   const { macrosPerServing } = recipe;
+  const scaledMacros = scaleMacros(macrosPerServing, servings);
 
   return (
     <Screen contentStyle={styles.content} withBottomInset>
@@ -91,6 +129,32 @@ export default function RecipeDetailScreen() {
         <MacroPill highlighted label="Net karb." value={`${macrosPerServing.netCarbG}`} unit="g" />
       </View>
       <Text style={styles.macroNote}>Değerler porsiyon başınadır.</Text>
+
+      <View style={styles.addCard}>
+        <Text style={styles.addTitle}>Bugüne ekle</Text>
+        <View style={styles.servingRow}>
+          {servingOptions.map((option) => (
+            <FilterChip
+              key={option}
+              label={`${option} porsiyon`}
+              onPress={() => setServings(option)}
+              selected={servings === option}
+            />
+          ))}
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => void handleAddToDay()}
+          style={({ pressed }) => [styles.addButton, pressed && styles.pressed]}>
+          <Text style={styles.addButtonText}>
+            {justAdded ? 'Eklendi ✓' : `Güne ekle · ${scaledMacros.kcal} kcal`}
+          </Text>
+        </Pressable>
+        <Text style={styles.addNote}>
+          {scaledMacros.fatG} g yağ · {scaledMacros.proteinG} g protein ·{' '}
+          {scaledMacros.netCarbG} g net karbonhidrat
+        </Text>
+      </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Malzemeler</Text>
@@ -153,6 +217,11 @@ function MacroPill({
 }
 
 const styles = StyleSheet.create({
+  addButton: { alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.sm, padding: spacing.md },
+  addButtonText: { color: colors.background, fontSize: typography.body, fontWeight: '700' },
+  addCard: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.md, padding: spacing.lg },
+  addNote: { color: colors.textMuted, fontSize: typography.small, textAlign: 'center' },
+  addTitle: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
   backButton: { alignSelf: 'flex-start', paddingVertical: spacing.sm },
   backText: { color: colors.accent, fontSize: typography.body, fontWeight: '700' },
   content: { gap: spacing.lg },
@@ -178,6 +247,7 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.6 },
   section: { gap: spacing.md },
   sectionTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700' },
+  servingRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   stepList: { gap: spacing.md },
   stepNumber: { alignItems: 'center', backgroundColor: colors.accentSurface, borderRadius: radius.pill, height: 28, justifyContent: 'center', width: 28 },
   stepNumberText: { color: colors.accent, fontSize: typography.small, fontWeight: '800' },
