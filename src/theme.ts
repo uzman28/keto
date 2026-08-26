@@ -8,6 +8,9 @@ export const colors = {
   surfaceElevated: '#1D3529',
   text: '#F2F7F3',
   textMuted: '#A9BBB0',
+  /** Trafik ışığının orta basamağı: "ölçülü tüket". */
+  warning: '#F5C25B',
+  warningSurface: '#463714',
 } as const;
 
 export const spacing = {

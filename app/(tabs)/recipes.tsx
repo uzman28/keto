@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { FilterChip } from '../../src/components/FilterChip';
 import { RecipeCard } from '../../src/components/RecipeCard';
+import { Screen } from '../../src/components/Screen';
 import { recipes } from '../../src/data/recipes';
 import { getFavorites, toggleFavorite } from '../../src/storage';
 import { colors, spacing, typography } from '../../src/theme';
@@ -38,13 +40,16 @@ export default function RecipesScreen() {
   const [carbFilter, setCarbFilter] = useState<CarbFilter>('all');
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
 
-  useEffect(() => {
-    async function loadFavorites() {
-      setFavoriteIds(await getFavorites());
-    }
+  // Detay ekranında favori değiştirilip geri dönülebildiği için her odaklanmada yeniden okuyoruz.
+  useFocusEffect(
+    useCallback(() => {
+      async function loadFavorites() {
+        setFavoriteIds(await getFavorites());
+      }
 
-    void loadFavorites();
-  }, []);
+      void loadFavorites();
+    }, []),
+  );
 
   const filteredRecipes = useMemo(
     () =>
@@ -63,12 +68,16 @@ export default function RecipesScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.content} style={styles.screen}>
+    <Screen>
       <Text style={styles.title}>Tarifler</Text>
 
       <View style={styles.filterGroup}>
         <Text style={styles.filterLabel}>Öğün</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipScrollContent}
+          style={styles.chipScroller}>
           {mealFilters.map((filter) => (
             <FilterChip
               key={filter.value}
@@ -110,11 +119,11 @@ export default function RecipesScreen() {
             favoriteIds={favoriteIds}
             onFavoritePress={handleFavorite}
             recipes={otherRecipes}
-            title={favoriteRecipes.length > 0 ? 'Tüm tarifler' : 'Tüm tarifler'}
+            title={favoriteRecipes.length > 0 ? 'Diğer tarifler' : 'Tüm tarifler'}
           />
         </View>
       )}
-    </ScrollView>
+    </Screen>
   );
 }
 
@@ -141,6 +150,7 @@ function RecipeSection({
           key={recipe.id}
           isFavorite={favoriteIds.includes(recipe.id)}
           onFavoritePress={() => void onFavoritePress(recipe.id)}
+          onPress={() => router.push({ pathname: '/recipe/[id]', params: { id: recipe.id } })}
           recipe={recipe}
         />
       ))}
@@ -150,12 +160,13 @@ function RecipeSection({
 
 const styles = StyleSheet.create({
   chipRow: { flexDirection: 'row', gap: spacing.sm },
-  content: { gap: spacing.xl, padding: spacing.xl, paddingBottom: spacing.xxl },
+  // Yatay çip listesi ekranın kenarına kadar kaysın diye sayfa boşluğunu iptal edip kendi içinde veriyoruz.
+  chipScrollContent: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.xl },
+  chipScroller: { marginHorizontal: -spacing.xl },
   emptyText: { color: colors.textMuted, fontSize: typography.body, textAlign: 'center' },
   filterGroup: { gap: spacing.sm },
   filterLabel: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
   recipeSections: { gap: spacing.xl },
-  screen: { backgroundColor: colors.background },
   section: { gap: spacing.md },
   sectionTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700' },
   title: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
