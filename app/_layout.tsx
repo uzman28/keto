@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { DayProvider } from '../src/day-context';
 import { ProfileProvider, useProfile } from '../src/profile-context';
 import { colors } from '../src/theme';
 
@@ -11,7 +12,9 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ProfileProvider>
-        <RootNavigator />
+        <DayProvider>
+          <RootNavigator />
+        </DayProvider>
       </ProfileProvider>
     </SafeAreaProvider>
   );
@@ -47,6 +50,9 @@ function RootNavigator() {
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="article/[id]" />
         <Stack.Screen name="recipe/[id]" />
+        <Stack.Screen name="foods" />
+        <Stack.Screen name="add-entry" />
+        <Stack.Screen name="weight" />
       </Stack>
     </>
   );

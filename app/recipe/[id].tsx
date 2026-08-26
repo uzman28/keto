@@ -5,7 +5,8 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FilterChip } from '../../src/components/FilterChip';
 import { Screen } from '../../src/components/Screen';
-import { getDateKey } from '../../src/date';
+import { formatDayLabel } from '../../src/date';
+import { useDay } from '../../src/day-context';
 import { recipes } from '../../src/data/recipes';
 import { scaleMacros } from '../../src/macros';
 import { addLogEntry, createEntryId, getFavorites, toggleFavorite } from '../../src/storage';
@@ -24,6 +25,7 @@ const mealLabels: Record<MealType, string> = {
 
 export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { isViewingToday, selectedDate, selectedDateKey } = useDay();
   const recipe = recipes.find((item) => item.id === id);
   const [isFavorite, setIsFavorite] = useState(false);
   const [servings, setServings] = useState(1);
@@ -66,7 +68,7 @@ export default function RecipeDetailScreen() {
       return;
     }
 
-    await addLogEntry(getDateKey(), {
+    await addLogEntry(selectedDateKey, {
       id: createEntryId(),
       title: recipe.title,
       recipeId: recipe.id,
@@ -131,7 +133,9 @@ export default function RecipeDetailScreen() {
       <Text style={styles.macroNote}>Değerler porsiyon başınadır.</Text>
 
       <View style={styles.addCard}>
-        <Text style={styles.addTitle}>Bugüne ekle</Text>
+        <Text style={styles.addTitle}>
+          {isViewingToday ? 'Bugüne ekle' : `${formatDayLabel(selectedDate)} gününe ekle`}
+        </Text>
         <View style={styles.servingRow}>
           {servingOptions.map((option) => (
             <FilterChip
@@ -147,7 +151,9 @@ export default function RecipeDetailScreen() {
           onPress={() => void handleAddToDay()}
           style={({ pressed }) => [styles.addButton, pressed && styles.pressed]}>
           <Text style={styles.addButtonText}>
-            {justAdded ? 'Eklendi ✓' : `Güne ekle · ${scaledMacros.kcal} kcal`}
+            {justAdded
+              ? 'Eklendi ✓'
+              : `${isViewingToday ? 'Bugüne' : 'Seçili güne'} ekle · ${scaledMacros.kcal} kcal`}
           </Text>
         </Pressable>
         <Text style={styles.addNote}>

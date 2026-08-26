@@ -1,15 +1,24 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { FoodTile } from '../../src/components/FoodTile';
 import { MacroBar } from '../../src/components/MacroBar';
 import { Screen } from '../../src/components/Screen';
+import { WaterCard } from '../../src/components/WaterCard';
 import { articles } from '../../src/data/articles';
-import { formatDayLabel, getDateKey } from '../../src/date';
+import { foods } from '../../src/data/foods';
+import { addDays, formatDayLabel } from '../../src/date';
+import { useDay } from '../../src/day-context';
 import { calculateMacros, sumMacros } from '../../src/macros';
 import { useProfile } from '../../src/profile-context';
-import { getEntriesForDate, removeLogEntry } from '../../src/storage';
+import {
+  changeWaterForDate,
+  getEntriesForDate,
+  getWaterForDate,
+  removeLogEntry,
+} from '../../src/storage';
 import { colors, radius, spacing, typography } from '../../src/theme';
 import type { LogEntry } from '../../src/types';
 
@@ -23,17 +32,24 @@ function getDayOfYear(date: Date): number {
 
 export default function HomeScreen() {
   const { profile } = useProfile();
+  const { goToToday, isViewingToday, selectedDate, selectedDateKey, setSelectedDate } = useDay();
   const [entries, setEntries] = useState<LogEntry[]>([]);
+  const [glasses, setGlasses] = useState(0);
 
-  // Tarif detayından güne ekleme yapılabildiği için her odaklanmada yeniden okuyoruz.
+  // Tarif detayından ve elle ekleme ekranından dönülebildiği için her odaklanmada okuyoruz.
   useFocusEffect(
     useCallback(() => {
-      async function loadEntries() {
-        setEntries(await getEntriesForDate(getDateKey()));
+      async function loadDay() {
+        const [dayEntries, dayGlasses] = await Promise.all([
+          getEntriesForDate(selectedDateKey),
+          getWaterForDate(selectedDateKey),
+        ]);
+        setEntries(dayEntries);
+        setGlasses(dayGlasses);
       }
 
-      void loadEntries();
-    }, []),
+      void loadDay();
+    }, [selectedDateKey]),
   );
 
   if (!profile) {
@@ -43,18 +59,63 @@ export default function HomeScreen() {
   const targets = calculateMacros(profile);
   const consumed = sumMacros(entries);
   const remainingCalories = targets.calories - consumed.kcal;
-  const dailyTip = articles[getDayOfYear(new Date()) % articles.length];
+  const dayOfYear = getDayOfYear(selectedDate);
+  const dailyTip = articles[dayOfYear % articles.length];
+  const featuredFood = foods[dayOfYear % foods.length];
+  // Vitrin her gun kayarak farkli besinleri one cikarsin diye gunden turetiliyor.
+  const deckFoods = [
+    featuredFood,
+    ...foods.filter((food) => food.id !== featuredFood.id).slice(dayOfYear % 20, (dayOfYear % 20) + 9),
+  ];
 
   async function handleRemove(entryId: string) {
-    setEntries(await removeLogEntry(getDateKey(), entryId));
+    setEntries(await removeLogEntry(selectedDateKey, entryId));
+  }
+
+  async function handleWaterChange(delta: number) {
+    setGlasses(await changeWaterForDate(selectedDateKey, delta));
   }
 
   return (
     <Screen>
-      <View style={styles.heading}>
-        <Text style={styles.greeting}>Bugün</Text>
-        <Text style={styles.summary}>{formatDayLabel()}</Text>
+      <View style={styles.dateRow}>
+        <Pressable
+          accessibilityLabel="Önceki gün"
+          accessibilityRole="button"
+          hitSlop={spacing.sm}
+          onPress={() => setSelectedDate(addDays(selectedDate, -1))}
+          style={({ pressed }) => [styles.dateArrow, pressed && styles.pressed]}>
+          <Ionicons color={colors.text} name="chevron-back" size={20} />
+        </Pressable>
+
+        <View style={styles.dateLabels}>
+          <Text style={styles.greeting}>{isViewingToday ? 'Bugün' : 'Geçmiş gün'}</Text>
+          <Text style={styles.summary}>{formatDayLabel(selectedDate)}</Text>
+        </View>
+
+        <Pressable
+          accessibilityLabel="Sonraki gün"
+          accessibilityRole="button"
+          disabled={isViewingToday}
+          hitSlop={spacing.sm}
+          onPress={() => setSelectedDate(addDays(selectedDate, 1))}
+          style={({ pressed }) => [
+            styles.dateArrow,
+            isViewingToday && styles.dateArrowDisabled,
+            pressed && styles.pressed,
+          ]}>
+          <Ionicons color={colors.text} name="chevron-forward" size={20} />
+        </Pressable>
       </View>
+
+      {!isViewingToday ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={goToToday}
+          style={({ pressed }) => [styles.todayButton, pressed && styles.pressed]}>
+          <Text style={styles.todayButtonText}>Bugüne dön</Text>
+        </Pressable>
+      ) : null}
 
       <View style={styles.calorieCard}>
         <Text style={styles.calorieLabel}>
@@ -91,20 +152,35 @@ export default function HomeScreen() {
         />
       </View>
 
+      <WaterCard glasses={glasses} onChange={(delta) => void handleWaterChange(delta)} />
+
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Bugün yediklerin</Text>
-        {entries.length === 0 ? (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{isViewingToday ? 'Bugün yediklerin' : 'O gün yedikleri'}</Text>
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.push('/recipes')}
-            style={({ pressed }) => [styles.emptyCard, pressed && styles.pressed]}>
-            <Ionicons color={colors.textMuted} name="restaurant-outline" size={28} />
-            <Text style={styles.emptyTitle}>Henüz bir şey eklemedin</Text>
-            <Text style={styles.emptyText}>
-              Tarifler sekmesinden bir tarif seçip "Güne ekle" ile buraya kaydedebilirsin.
-            </Text>
-            <Text style={styles.emptyLink}>Tariflere git →</Text>
+            onPress={() => router.push('/add-entry')}
+            style={({ pressed }) => [styles.addLink, pressed && styles.pressed]}>
+            <Ionicons color={colors.accent} name="add" size={16} />
+            <Text style={styles.addLinkText}>Ekle</Text>
           </Pressable>
+        </View>
+
+        {entries.length === 0 ? (
+          <View style={styles.emptyCard}>
+            <Ionicons color={colors.textMuted} name="restaurant-outline" size={28} />
+            <Text style={styles.emptyTitle}>Kayıt yok</Text>
+            <Text style={styles.emptyText}>
+              Yukarıdaki "Ekle" ile yiyecek arayabilir, tariflerden seçebilir ya da
+              değerleri kendin girebilirsin.
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.push('/recipes')}
+              style={({ pressed }) => pressed && styles.pressed}>
+              <Text style={styles.emptyLink}>Tariflere git →</Text>
+            </Pressable>
+          </View>
         ) : (
           <View style={styles.entryList}>
             {entries.map((entry, index) => (
@@ -114,8 +190,9 @@ export default function HomeScreen() {
                     {entry.title}
                   </Text>
                   <Text style={styles.entryMeta}>
-                    {entry.servings} porsiyon · {entry.macros.kcal} kcal ·{' '}
-                    {entry.macros.netCarbG} g net karb.
+                    {entry.servings ? `${entry.servings} porsiyon · ` : ''}
+                    {entry.grams ? `${entry.grams} g · ` : ''}
+                    {entry.macros.kcal} kcal · {entry.macros.netCarbG} g net karb.
                   </Text>
                 </View>
                 <Pressable
@@ -132,10 +209,38 @@ export default function HomeScreen() {
         )}
       </View>
 
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Ketoya uygun mu?</Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/foods')}
+            style={({ pressed }) => [styles.addLink, pressed && styles.pressed]}>
+            <Text style={styles.addLinkText}>Tüm besinler</Text>
+            <Ionicons color={colors.accent} name="chevron-forward" size={14} />
+          </Pressable>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.deckContent}
+          style={styles.deckScroller}>
+          {deckFoods.map((food, index) => (
+            <FoodTile
+              key={food.id}
+              eyebrow={index === 0 ? 'GÜNÜN BESİNİ' : undefined}
+              food={food}
+              onPress={() => router.push({ pathname: '/foods', params: { focus: food.id } })}
+            />
+          ))}
+        </ScrollView>
+      </View>
+
       <Pressable
         accessibilityRole="button"
         onPress={() => router.push({ pathname: '/article/[id]', params: { id: dailyTip.id } })}
-        style={({ pressed }) => [styles.tipCard, pressed && styles.tipCardPressed]}>
+        style={({ pressed }) => [styles.tipCard, pressed && styles.pressed]}>
         <Text style={styles.tipLabel}>GÜNÜN İPUCU</Text>
         <Text style={styles.tipTitle}>{dailyTip.title}</Text>
         <Text style={styles.tipSummary}>{dailyTip.summary}</Text>
@@ -148,6 +253,8 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  addLink: { alignItems: 'center', flexDirection: 'row', gap: spacing.xs },
+  addLinkText: { color: colors.accent, fontSize: typography.small, fontWeight: '700' },
   calorieCard: {
     alignItems: 'center',
     backgroundColor: colors.surface,
@@ -163,6 +270,12 @@ const styles = StyleSheet.create({
   calorieUnit: { color: colors.textMuted, fontSize: typography.body },
   calorieValue: { color: colors.text, fontSize: typography.display, fontWeight: '800', lineHeight: 66 },
   calorieValueOver: { color: colors.danger },
+  dateArrow: { alignItems: 'center', borderColor: colors.border, borderRadius: radius.pill, borderWidth: 1, height: 40, justifyContent: 'center', width: 40 },
+  dateArrowDisabled: { opacity: 0.3 },
+  dateLabels: { alignItems: 'center', flex: 1, gap: spacing.xs },
+  dateRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.md },
+  deckContent: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.xl },
+  deckScroller: { marginHorizontal: -spacing.xl },
   disclaimer: { color: colors.textMuted, fontSize: typography.small, lineHeight: 19, textAlign: 'center' },
   emptyCard: { alignItems: 'center', backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderStyle: 'dashed', borderWidth: 1, gap: spacing.sm, padding: spacing.xl },
   emptyLink: { color: colors.accent, fontSize: typography.small, fontWeight: '700', marginTop: spacing.xs },
@@ -175,16 +288,17 @@ const styles = StyleSheet.create({
   entryRowDivider: { borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth },
   entryTitle: { color: colors.text, fontSize: typography.body, fontWeight: '600' },
   greeting: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
-  heading: { gap: spacing.xs },
   macroCard: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.lg, padding: spacing.lg },
   pressed: { opacity: 0.8 },
   section: { gap: spacing.md },
+  sectionHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
   sectionTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700' },
-  summary: { color: colors.textMuted, fontSize: typography.body },
+  summary: { color: colors.textMuted, fontSize: typography.small },
   tipCard: { backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.sm, padding: spacing.lg },
-  tipCardPressed: { opacity: 0.8 },
   tipLabel: { color: colors.accent, fontSize: typography.small, fontWeight: '700', letterSpacing: 1 },
   tipLink: { color: colors.accent, fontSize: typography.small, fontWeight: '700', marginTop: spacing.xs },
   tipSummary: { color: colors.textMuted, fontSize: typography.body, lineHeight: 23 },
   tipTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700', lineHeight: 27 },
+  todayButton: { alignItems: 'center', borderColor: colors.accent, borderRadius: radius.pill, borderWidth: 1, paddingVertical: spacing.sm },
+  todayButtonText: { color: colors.accent, fontSize: typography.small, fontWeight: '700' },
 });

@@ -32,8 +32,8 @@ export default function SettingsScreen() {
 
   function handleReset() {
     Alert.alert(
-      'Verileri sıfırla',
-      'Profilin ve hesaplanan hedeflerin silinecek. Favori tariflerin ve günlük kayıtların korunur. Devam edilsin mi?',
+      'Profili sıfırla',
+      'Profilin ve hesaplanan hedeflerin silinecek; yeniden bilgi girmen istenecek. Favori tariflerin, günlük kayıtların, su ve kilo ölçümlerin korunur. Devam edilsin mi?',
       [
         { text: 'Vazgeç', style: 'cancel' },
         {
@@ -87,16 +87,23 @@ export default function SettingsScreen() {
       <View style={styles.actions}>
         <Pressable
           accessibilityRole="button"
-          onPress={() => router.push('/onboarding')}
+          onPress={() => router.push('/weight')}
           style={({ pressed }) => [styles.primaryButton, pressed && styles.pressed]}>
-          <Text style={styles.primaryButtonText}>Bilgilerimi güncelle</Text>
+          <Text style={styles.primaryButtonText}>Kilo takibi</Text>
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/onboarding')}
+          style={({ pressed }) => [styles.secondaryButton, pressed && styles.pressed]}>
+          <Text style={styles.secondaryButtonText}>Bilgilerimi güncelle</Text>
         </Pressable>
 
         <Pressable
           accessibilityRole="button"
           onPress={handleReset}
           style={({ pressed }) => [styles.dangerButton, pressed && styles.pressed]}>
-          <Text style={styles.dangerButtonText}>Verileri sıfırla</Text>
+          <Text style={styles.dangerButtonText}>Profili sıfırla</Text>
         </Pressable>
       </View>
 
@@ -138,6 +145,8 @@ const styles = StyleSheet.create({
   rowLabel: { color: colors.textMuted, flex: 1, fontSize: typography.body },
   rowValue: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
   rowValueHighlighted: { color: colors.accent },
+  secondaryButton: { alignItems: 'center', borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, padding: spacing.lg },
+  secondaryButtonText: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
   section: { gap: spacing.md },
   sectionTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700' },
   title: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },

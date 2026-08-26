@@ -2,21 +2,22 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { colors, radius, spacing, typography } from '../theme';
 
-interface NumberInputProps {
-  keyboardType: 'decimal-pad' | 'number-pad';
+interface LabeledInputProps {
+  keyboardType?: 'decimal-pad' | 'default' | 'number-pad';
   label: string;
   onChangeText: (value: string) => void;
+  placeholder?: string;
   value: string;
 }
 
-export function NumberInput({ keyboardType, label, onChangeText, value }: NumberInputProps) {
+export function LabeledInput({ keyboardType = 'default', label, onChangeText, placeholder, value }: LabeledInputProps) {
   return (
     <View style={styles.group}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
         keyboardType={keyboardType}
         onChangeText={onChangeText}
-        placeholder={label}
+        placeholder={placeholder ?? label}
         placeholderTextColor={colors.textMuted}
         selectionColor={colors.accent}
         style={styles.input}

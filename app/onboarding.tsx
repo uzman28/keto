@@ -12,7 +12,7 @@ import {
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { NumberInput } from '../src/components/NumberInput';
+import { LabeledInput } from '../src/components/LabeledInput';
 import { SelectableOption } from '../src/components/SelectableOption';
 import { useProfile } from '../src/profile-context';
 import { saveProfile } from '../src/storage';
@@ -117,11 +117,11 @@ export default function OnboardingScreen() {
         </View>
 
         <View style={styles.section}>
-          <NumberInput label="Yaş" onChangeText={setAge} value={age} keyboardType="number-pad" />
+          <LabeledInput label="Yaş" onChangeText={setAge} value={age} keyboardType="number-pad" />
           {ageError ? <Text style={styles.error}>{ageError}</Text> : null}
-          <NumberInput label="Boy (cm)" onChangeText={setHeightCm} value={heightCm} keyboardType="number-pad" />
+          <LabeledInput label="Boy (cm)" onChangeText={setHeightCm} value={heightCm} keyboardType="number-pad" />
           {heightError ? <Text style={styles.error}>{heightError}</Text> : null}
-          <NumberInput label="Kilo (kg)" onChangeText={setWeightKg} value={weightKg} keyboardType="decimal-pad" />
+          <LabeledInput label="Kilo (kg)" onChangeText={setWeightKg} value={weightKg} keyboardType="decimal-pad" />
           {weightError ? <Text style={styles.error}>{weightError}</Text> : null}
         </View>
 

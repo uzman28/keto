@@ -51,19 +51,62 @@ export interface Recipe {
   tips?: string;
 }
 
-/** Güne eklenmiş tek bir öğün kaydı. macros porsiyonla çarpılmış toplamı tutar. */
+/**
+ * Güne eklenmiş tek bir öğün kaydı. macros porsiyonla çarpılmış toplamı tutar.
+ * recipeId/mealType/servings yalnızca tariften eklenen kayıtlarda dolu olur;
+ * elle girilen yiyeceklerde bunlar bulunmaz.
+ */
 export interface LogEntry {
   id: string;
   title: string;
-  recipeId: string;
-  mealType: MealType;
-  servings: number;
+  recipeId?: string;
+  mealType?: MealType;
+  servings?: number;
+  /** Besin listesinden eklendiyse hangi besin ve kaç gram. */
+  foodId?: string;
+  grams?: number;
   macros: FoodMacros;
   createdAt: string;
 }
 
 /** Tarih anahtarı ('2026-08-18') -> o günün kayıtları. */
 export type DayLog = Record<string, LogEntry[]>;
+
+export type FoodCategory =
+  | 'sebze'
+  | 'meyve'
+  | 'protein'
+  | 'yag'
+  | 'sut'
+  | 'kuruyemis'
+  | 'tahil'
+  | 'baklagil'
+  | 'icecek'
+  | 'tatli';
+
+/** Trafik ışığı: yeni başlayan için en hızlı okunan bilgi. */
+export type FoodVerdict = 'serbest' | 'olculu' | 'kacin';
+
+/** Gerçek hayatta karşılığı olan ölçü — gram tek başına soyut kalıyor. */
+export interface FoodPortion {
+  label: string;
+  grams: number;
+}
+
+export interface Food {
+  id: string;
+  name: string;
+  category: FoodCategory;
+  verdict: FoodVerdict;
+  /** 100 gram (içeceklerde 100 ml) başına yaklaşık değerler. */
+  per100g: FoodMacros;
+  /** İlk eleman varsayılan porsiyondur. */
+  portions: FoodPortion[];
+  /** Şapkasız veya yaygın yanlış yazımlar: 'yogurt', 'kasar'. */
+  aliases?: string[];
+  /** Neden bu grupta olduğu; asıl öğretici kısım. */
+  why: string;
+}
 
 export interface Article {
   id: string;
@@ -72,4 +115,10 @@ export interface Article {
   category: 'temel' | 'baslangic' | 'sorun-cozme' | 'beslenme';
   readMin: number;
   body: string;
+}
+
+/** Gün başına tek kilo ölçümü. date, getDateKey() ile üretilmiş 'YYYY-MM-DD'. */
+export interface WeightEntry {
+  date: string;
+  weightKg: number;
 }

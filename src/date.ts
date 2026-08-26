@@ -21,3 +21,18 @@ export function getDateKey(date: Date = new Date()): string {
 export function formatDayLabel(date: Date = new Date()): string {
   return `${date.getDate()} ${monthNames[date.getMonth()]}, ${weekdayNames[date.getDay()]}`;
 }
+
+export function addDays(date: Date, days: number): Date {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+
+  return next;
+}
+
+export function isSameDay(first: Date, second: Date): boolean {
+  return getDateKey(first) === getDateKey(second);
+}
+
+export function isToday(date: Date): boolean {
+  return isSameDay(date, new Date());
+}

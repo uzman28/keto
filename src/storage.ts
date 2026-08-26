@@ -1,10 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import type { DayLog, LogEntry, UserProfile } from './types';
+import type { DayLog, LogEntry, UserProfile, WeightEntry } from './types';
 
 const PROFILE_KEY = '@keto/profile';
 const FAVORITES_KEY = '@keto/favorites';
 const LOG_KEY = '@keto/log';
+const WATER_KEY = '@keto/water';
+const WEIGHT_KEY = '@keto/weight';
 
 /** Kayıtlar cihazda sınırsız birikmesin diye tutulan en fazla gün sayısı. */
 const MAX_LOG_DAYS = 90;
@@ -129,4 +131,101 @@ export async function removeLogEntry(dateKey: string, entryId: string): Promise<
 /** Kayıt kimliği; uuid bağımlılığı eklemeden çakışmayacak kadar ayırt edici. */
 export function createEntryId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// --- Su takibi -------------------------------------------------------------
+
+type WaterLog = Record<string, number>;
+
+async function readWaterLog(): Promise<WaterLog> {
+  try {
+    const savedLog = await AsyncStorage.getItem(WATER_KEY);
+    if (!savedLog) {
+      return {};
+    }
+
+    const parsedLog: unknown = JSON.parse(savedLog);
+    return parsedLog && typeof parsedLog === 'object' && !Array.isArray(parsedLog)
+      ? (parsedLog as WaterLog)
+      : {};
+  } catch {
+    return {};
+  }
+}
+
+export async function getWaterForDate(dateKey: string): Promise<number> {
+  const log = await readWaterLog();
+  const glasses = log[dateKey];
+
+  return typeof glasses === 'number' && Number.isFinite(glasses) ? Math.max(glasses, 0) : 0;
+}
+
+/** delta kadar bardak ekler/çıkarır ve yeni değeri döndürür. Sonuç 0'ın altına inmez. */
+export async function changeWaterForDate(dateKey: string, delta: number): Promise<number> {
+  const current = await getWaterForDate(dateKey);
+  const next = Math.max(current + delta, 0);
+
+  try {
+    const log = await readWaterLog();
+    const recentDates = Object.keys({ ...log, [dateKey]: next })
+      .sort()
+      .slice(-MAX_LOG_DAYS);
+    const pruned = Object.fromEntries(
+      recentDates.map((key) => [key, key === dateKey ? next : log[key]]),
+    );
+
+    await AsyncStorage.setItem(WATER_KEY, JSON.stringify(pruned));
+    return next;
+  } catch {
+    return current;
+  }
+}
+
+// --- Kilo takibi -----------------------------------------------------------
+
+export async function getWeightEntries(): Promise<WeightEntry[]> {
+  try {
+    const savedEntries = await AsyncStorage.getItem(WEIGHT_KEY);
+    if (!savedEntries) {
+      return [];
+    }
+
+    const parsedEntries: unknown = JSON.parse(savedEntries);
+    if (!Array.isArray(parsedEntries)) {
+      return [];
+    }
+
+    return (parsedEntries as WeightEntry[])
+      .filter((entry) => typeof entry?.date === 'string' && Number.isFinite(entry?.weightKg))
+      .sort((first, second) => first.date.localeCompare(second.date));
+  } catch {
+    return [];
+  }
+}
+
+/** Aynı güne ikinci kez girilirse eski kayıt güncellenir; gün başına tek ölçüm tutuyoruz. */
+export async function saveWeightEntry(entry: WeightEntry): Promise<WeightEntry[]> {
+  const entries = await getWeightEntries();
+  const updated = [...entries.filter((item) => item.date !== entry.date), entry].sort(
+    (first, second) => first.date.localeCompare(second.date),
+  );
+
+  try {
+    await AsyncStorage.setItem(WEIGHT_KEY, JSON.stringify(updated));
+    return updated;
+  } catch {
+    return entries;
+  }
+}
+
+export async function removeWeightEntry(dateKey: string): Promise<WeightEntry[]> {
+  const entries = await getWeightEntries();
+  const updated = entries.filter((entry) => entry.date !== dateKey);
+
+  try {
+    await AsyncStorage.setItem(WEIGHT_KEY, JSON.stringify(updated));
+    return updated;
+  } catch {
+    return entries;
+  }
 }

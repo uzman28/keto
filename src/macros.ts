@@ -70,3 +70,8 @@ export function sumMacros(entries: LogEntry[]): FoodMacros {
     { kcal: 0, fatG: 0, proteinG: 0, netCarbG: 0 },
   );
 }
+
+/** Porsiyon gramajından makro hesaplar; per100g değerleri 100 g referanslıdır. */
+export function macrosForGrams(per100g: FoodMacros, grams: number): FoodMacros {
+  return scaleMacros(per100g, grams / 100);
+}
