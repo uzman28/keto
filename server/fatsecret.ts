@@ -124,6 +124,28 @@ function num(value: string | number | undefined): number | undefined {
 /** FatSecret'ın "böyle bir kayıt yok" kodu; hata değil, bulunamadı demek. */
 const INVALID_ID_CODE = 106;
 
+/**
+ * Geçici sayılan hata kodları — yeniden denemeye değer.
+ *
+ * 21 (Invalid IP): whitelist kaydı FatSecret'ın sunucuları arasında tutarsız
+ * dağıtılıyor. Aynı IP'den arka arkaya gelen istekler farklı sonuç veriyor;
+ * ölçtüğümüzde 30 dakika boyunca ~%25 başarı oranında sabitlendi. İstekler
+ * bağımsız olduğu için hemen yeniden denemek oranı pratikte %100'e çıkarıyor.
+ */
+const TRANSIENT_ERROR_CODES = new Set([21]);
+
+export class FatSecretError extends Error {
+  code: number | undefined;
+  isTransient: boolean;
+
+  constructor(code: number | undefined, message: string | undefined) {
+    super(`FatSecret hatası ${code}: ${message}`);
+    this.name = 'FatSecretError';
+    this.code = code;
+    this.isTransient = code !== undefined && TRANSIENT_ERROR_CODES.has(code);
+  }
+}
+
 function apiError(parsed: unknown): { code?: number; message?: string } | undefined {
   return (parsed as { error?: { code?: number; message?: string } }).error;
 }
@@ -131,8 +153,48 @@ function apiError(parsed: unknown): { code?: number; message?: string } | undefi
 function throwIfApiError(parsed: unknown): void {
   const err = apiError(parsed);
   if (err) {
-    throw new Error(`FatSecret hatası ${err.code}: ${err.message}`);
+    throw new FatSecretError(err.code, err.message);
   }
+}
+
+/** %25 başarı oranında 8 deneme ~%90, 12 deneme ~%97 tutturuyor. */
+const MAX_ATTEMPTS = 10;
+const RETRY_DELAY_MS = 150;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Geçici hatalarda yeniden dener. Kalıcı hatalar (geçersiz ID, kapalı scope,
+ * hatalı kimlik) ilk denemede yukarı fırlatılır — onları tekrarlamak kotayı
+ * boşa harcar ve kullanıcıyı bekletir.
+ */
+async function withRetry<T>(operation: () => Promise<T>, label: string): Promise<T> {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const result = await operation();
+      if (attempt > 1) {
+        console.log(`[fatsecret] ${label}: ${attempt}. denemede geçti`);
+      }
+      return result;
+    } catch (error) {
+      lastError = error;
+
+      if (!(error instanceof FatSecretError) || !error.isTransient) {
+        throw error;
+      }
+
+      if (attempt < MAX_ATTEMPTS) {
+        await sleep(RETRY_DELAY_MS);
+      }
+    }
+  }
+
+  console.error(`[fatsecret] ${label}: ${MAX_ATTEMPTS} denemenin hepsi reddedildi`);
+  throw lastError;
 }
 
 /**
@@ -176,39 +238,41 @@ export async function searchFoods(
 ): Promise<FoodSearchResult[]> {
   const token = await getAccessToken(config);
 
-  const response = await fetch(LEGACY_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      method: 'foods.search',
-      search_expression: query,
-      max_results: String(Math.min(maxResults, 50)),
-      format: 'json',
-    }).toString(),
-  });
+  return withRetry(async () => {
+    const response = await fetch(LEGACY_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        method: 'foods.search',
+        search_expression: query,
+        max_results: String(Math.min(maxResults, 50)),
+        format: 'json',
+      }).toString(),
+    });
 
-  const text = await response.text();
+    const text = await response.text();
 
-  if (!response.ok) {
-    throw new Error(`Arama başarısız (HTTP ${response.status}): ${text}`);
-  }
+    if (!response.ok) {
+      throw new Error(`Arama başarısız (HTTP ${response.status}): ${text}`);
+    }
 
-  const data = JSON.parse(text) as { foods?: { food?: RawSearchFood | RawSearchFood[] } };
-  // FatSecret hataları HTTP 200 gövdesinde de dönebiliyor.
-  throwIfApiError(data);
+    const data = JSON.parse(text) as { foods?: { food?: RawSearchFood | RawSearchFood[] } };
+    // FatSecret hataları HTTP 200 gövdesinde de dönebiliyor.
+    throwIfApiError(data);
 
-  return toArray(data.foods?.food)
-    .filter((food) => food.food_id && food.food_name)
-    .map((food) => ({
-      id: food.food_id as string,
-      name: food.food_name as string,
-      brand: food.brand_name,
-      isBranded: food.food_type === 'Brand',
-      summary: parseFoodDescription(food.food_description),
-    }));
+    return toArray(data.foods?.food)
+      .filter((food) => food.food_id && food.food_name)
+      .map((food) => ({
+        id: food.food_id as string,
+        name: food.food_name as string,
+        brand: food.brand_name,
+        isBranded: food.food_type === 'Brand',
+        summary: parseFoodDescription(food.food_description),
+      }));
+  }, `arama "${query}"`);
 }
 
 interface RawServing {
@@ -301,21 +365,23 @@ export async function getFoodById(
   url.searchParams.set('food_id', foodId);
   url.searchParams.set('format', 'json');
 
-  const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  const text = await response.text();
+  return withRetry(async () => {
+    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    const text = await response.text();
 
-  if (!response.ok) {
-    throw new Error(`Besin getirilemedi (HTTP ${response.status}): ${text}`);
-  }
+    if (!response.ok) {
+      throw new Error(`Besin getirilemedi (HTTP ${response.status}): ${text}`);
+    }
 
-  const data = JSON.parse(text) as { food?: RawFood };
+    const data = JSON.parse(text) as { food?: RawFood };
 
-  // Geçersiz ID bir arıza değil, "bulunamadı" durumu — çağıran 404 üretebilsin.
-  const err = apiError(data);
-  if (err?.code === INVALID_ID_CODE) {
-    return null;
-  }
-  throwIfApiError(data);
+    // Geçersiz ID bir arıza değil, "bulunamadı" durumu — çağıran 404 üretebilsin.
+    const err = apiError(data);
+    if (err?.code === INVALID_ID_CODE) {
+      return null;
+    }
+    throwIfApiError(data);
 
-  return data.food ? normalizeFood(data.food) : null;
+    return data.food ? normalizeFood(data.food) : null;
+  }, `detay ${foodId}`);
 }
