@@ -5,7 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { CalorieRing } from '../../src/components/CalorieRing';
 import { FoodTile } from '../../src/components/FoodTile';
-import { MacroBar } from '../../src/components/MacroBar';
+import { MacroCardLarge, MacroCardSmall } from '../../src/components/MacroCards';
 import { Screen } from '../../src/components/Screen';
 import { WaterCard } from '../../src/components/WaterCard';
 import { articles } from '../../src/data/articles';
@@ -32,8 +32,8 @@ function getDayOfYear(date: Date): number {
 }
 
 export default function HomeScreen() {
-  const { profile } = useProfile();
   const { goToToday, isViewingToday, selectedDate, selectedDateKey, setSelectedDate } = useDay();
+  const { profile } = useProfile();
   const [entries, setEntries] = useState<LogEntry[]>([]);
   const [glasses, setGlasses] = useState(0);
 
@@ -62,13 +62,14 @@ export default function HomeScreen() {
   const dayOfYear = getDayOfYear(selectedDate);
   const dailyTip = articles[dayOfYear % articles.length];
   const featuredFood = foods[dayOfYear % foods.length];
-  // Vitrin her gün kayarak farklı besinleri öne çıkarsın diye günden türetiliyor.
   const deckFoods = [
     featuredFood,
     ...foods
       .filter((food) => food.id !== featuredFood.id)
       .slice(dayOfYear % 20, (dayOfYear % 20) + 9),
   ];
+
+  const isCarbOver = consumed.netCarbG > targets.netCarbG;
 
   async function handleRemove(entryId: string) {
     setEntries(await removeLogEntry(selectedDateKey, entryId));
@@ -79,11 +80,14 @@ export default function HomeScreen() {
   }
 
   return (
-    <Screen>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>{isViewingToday ? 'Bugün' : 'Geçmiş'}</Text>
-          <Text style={styles.eyebrow}>{formatDayLabel(selectedDate)}</Text>
+    <Screen contentStyle={styles.content}>
+      {/* Üst çubuk: logo karesi + uygulama adı + gün gezintisi */}
+      <View style={styles.appBar}>
+        <View style={styles.brand}>
+          <View style={styles.logo}>
+            <Ionicons color={colors.accent} name="flash" size={16} />
+          </View>
+          <Text style={styles.brandText}>KETO</Text>
         </View>
 
         <View style={styles.dateNav}>
@@ -93,7 +97,7 @@ export default function HomeScreen() {
             hitSlop={spacing.sm}
             onPress={() => setSelectedDate(addDays(selectedDate, -1))}
             style={({ pressed }) => [styles.navButton, pressed && styles.pressed]}>
-            <Ionicons color={colors.textMuted} name="chevron-back" size={18} />
+            <Ionicons color={colors.textMuted} name="chevron-back" size={17} />
           </Pressable>
           <Pressable
             accessibilityLabel="Sonraki gün"
@@ -106,59 +110,96 @@ export default function HomeScreen() {
               isViewingToday && styles.navButtonDisabled,
               pressed && styles.pressed,
             ]}>
-            <Ionicons color={colors.textMuted} name="chevron-forward" size={18} />
+            <Ionicons color={colors.textMuted} name="chevron-forward" size={17} />
           </Pressable>
         </View>
       </View>
 
-      {!isViewingToday ? (
-        <Pressable
-          accessibilityRole="button"
-          onPress={goToToday}
-          style={({ pressed }) => [styles.todayButton, pressed && styles.pressed]}>
-          <Text style={styles.todayButtonText}>BUGÜNE DÖN</Text>
-        </Pressable>
-      ) : null}
+      {/* Başlık bloğu + durum rozeti */}
+      <View style={styles.headingRow}>
+        <View style={styles.headingText}>
+          <Text style={styles.title}>{isViewingToday ? 'BUGÜN' : 'GEÇMİŞ'}</Text>
+          <Text style={styles.eyebrow}>{formatDayLabel(selectedDate)}</Text>
+        </View>
+
+        {isViewingToday ? (
+          <View style={[styles.badge, isCarbOver && styles.badgeDanger]}>
+            <View style={[styles.badgeDot, isCarbOver && styles.badgeDotDanger]} />
+            <Text style={[styles.badgeText, isCarbOver && styles.badgeTextDanger]}>
+              {isCarbOver ? 'AŞILDI' : 'HEDEFTE'}
+            </Text>
+          </View>
+        ) : (
+          <Pressable
+            accessibilityRole="button"
+            onPress={goToToday}
+            style={({ pressed }) => [styles.badge, pressed && styles.pressed]}>
+            <Text style={styles.badgeText}>BUGÜNE DÖN</Text>
+          </Pressable>
+        )}
+      </View>
 
       <CalorieRing consumed={consumed.kcal} target={targets.calories} />
 
-      {/* Makrolar kutusuz akıyor — ayrımı boşluk yapıyor, çerçeve değil. */}
-      <View style={styles.macroGroup}>
-        <MacroBar consumed={consumed.fatG} target={targets.fatG} title="Yağ" unit="g" />
-        <MacroBar consumed={consumed.proteinG} target={targets.proteinG} title="Protein" unit="g" />
-        <MacroBar
+      {/* Günün ipucu — tasarımdaki "AI Insight" kartının karşılığı */}
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => router.push({ pathname: '/article/[id]', params: { id: dailyTip.id } })}
+        style={({ pressed }) => [styles.insight, pressed && styles.pressed]}>
+        <View style={styles.insightGlow} />
+        <View style={styles.insightIcon}>
+          <Ionicons color={colors.accent} name="bulb-outline" size={20} />
+        </View>
+        <View style={styles.insightBody}>
+          <Text style={styles.insightLabel}>GÜNÜN İPUCU</Text>
+          <Text style={styles.insightText}>{dailyTip.title}</Text>
+        </View>
+      </Pressable>
+
+      {/* Asimetrik makro ızgarası: net karbonhidrat büyük, diğer ikisi dar */}
+      <View style={styles.macroGrid}>
+        <MacroCardLarge
           consumed={consumed.netCarbG}
+          icon="flame"
           isCeiling
           target={targets.netCarbG}
           title="Net karbonhidrat"
-          unit="g"
         />
+        <View style={styles.macroRow}>
+          <MacroCardSmall
+            color={colors.success}
+            consumed={consumed.proteinG}
+            target={targets.proteinG}
+            title="Protein"
+          />
+          <MacroCardSmall
+            color={colors.accentSoft}
+            consumed={consumed.fatG}
+            target={targets.fatG}
+            title="Yağ"
+          />
+        </View>
       </View>
+
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => router.push('/add-entry')}
+        style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}>
+        <Ionicons color={colors.background} name="add" size={19} />
+        <Text style={styles.ctaText}>YİYECEK EKLE</Text>
+      </Pressable>
 
       <WaterCard glasses={glasses} onChange={(delta) => void handleWaterChange(delta)} />
 
       <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionLabel}>
-            {isViewingToday ? 'BUGÜN YEDİKLERİN' : 'O GÜN YEDİKLERİ'}
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.push('/add-entry')}
-            style={({ pressed }) => [styles.addLink, pressed && styles.pressed]}>
-            <Ionicons color={colors.accent} name="add" size={15} />
-            <Text style={styles.addLinkText}>EKLE</Text>
-          </Pressable>
-        </View>
+        <Text style={styles.sectionLabel}>
+          {isViewingToday ? 'BUGÜN YEDİKLERİN' : 'O GÜN YEDİKLERİ'}
+        </Text>
 
         {entries.length === 0 ? (
           <View style={styles.emptyCard}>
-            <Ionicons color={colors.textFaint} name="restaurant-outline" size={26} />
-            <Text style={styles.emptyTitle}>Kayıt yok</Text>
-            <Text style={styles.emptyText}>
-              Yukarıdaki "Ekle" ile yiyecek arayabilir, tariflerden seçebilir ya da değerleri
-              kendin girebilirsin.
-            </Text>
+            <Ionicons color={colors.textFaint} name="add-circle-outline" size={28} />
+            <Text style={styles.emptyText}>KAYIT BEKLENİYOR</Text>
           </View>
         ) : (
           <View style={styles.entryList}>
@@ -195,8 +236,8 @@ export default function HomeScreen() {
           <Pressable
             accessibilityRole="button"
             onPress={() => router.push('/foods')}
-            style={({ pressed }) => [styles.addLink, pressed && styles.pressed]}>
-            <Text style={styles.addLinkText}>TÜMÜ</Text>
+            style={({ pressed }) => [styles.link, pressed && styles.pressed]}>
+            <Text style={styles.linkText}>TÜMÜ</Text>
             <Ionicons color={colors.accent} name="chevron-forward" size={13} />
           </Pressable>
         </View>
@@ -217,26 +258,53 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
 
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => router.push({ pathname: '/article/[id]', params: { id: dailyTip.id } })}
-        style={({ pressed }) => [styles.tipCard, pressed && styles.pressed]}>
-        <View style={styles.tipGlow} />
-        <Text style={styles.tipLabel}>GÜNÜN İPUCU</Text>
-        <Text style={styles.tipTitle}>{dailyTip.title}</Text>
-        <Text style={styles.tipSummary}>{dailyTip.summary}</Text>
-      </Pressable>
-
       <Text style={styles.disclaimer}>{disclaimer}</Text>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  addLink: { alignItems: 'center', flexDirection: 'row', gap: 2 },
-  addLinkText: {
+  appBar: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
+  badge: {
+    alignItems: 'center',
+    backgroundColor: colors.accentSurface,
+    borderRadius: radius.sm,
+    flexDirection: 'row',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 5,
+  },
+  badgeDanger: { backgroundColor: colors.dangerSurface },
+  badgeDot: { backgroundColor: colors.accent, borderRadius: radius.pill, height: 6, width: 6 },
+  badgeDotDanger: { backgroundColor: colors.danger },
+  badgeText: {
     color: colors.accent,
     fontFamily: fonts.bold,
+    fontSize: 11,
+    letterSpacing: tracking.wide,
+  },
+  badgeTextDanger: { color: colors.danger },
+  brand: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm },
+  brandText: {
+    color: colors.text,
+    fontFamily: fonts.black,
+    fontSize: typography.body,
+    letterSpacing: tracking.tight,
+  },
+  content: { gap: spacing.lg },
+  cta: {
+    alignItems: 'center',
+    backgroundColor: colors.accent,
+    borderRadius: radius.md,
+    flexDirection: 'row',
+    gap: spacing.sm,
+    justifyContent: 'center',
+    paddingVertical: spacing.lg,
+  },
+  ctaPressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  ctaText: {
+    color: colors.background,
+    fontFamily: fonts.black,
     fontSize: typography.small,
     letterSpacing: tracking.wide,
   },
@@ -257,11 +325,14 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderWidth: 1,
     gap: spacing.sm,
-    padding: spacing.xl,
+    paddingVertical: spacing.xl,
   },
-  emptyText: { ...text.caption, color: colors.textFaint, lineHeight: 19, textAlign: 'center' },
-  emptyTitle: { ...text.title, fontSize: typography.body },
-  /** Sol kenardaki ince mor şerit — kayıtları listeden ayıran imza detay. */
+  emptyText: {
+    color: colors.textFaint,
+    fontFamily: fonts.medium,
+    fontSize: typography.small,
+    letterSpacing: tracking.wide,
+  },
   entryAccent: { backgroundColor: colors.accent, borderRadius: radius.pill, height: 28, width: 2 },
   entryInfo: { flex: 1, gap: 3 },
   entryList: {
@@ -279,68 +350,82 @@ const styles = StyleSheet.create({
   },
   entryRowDivider: { borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth },
   entryTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: typography.body },
-  eyebrow: { ...text.eyebrow, marginTop: 2 },
-  header: { alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' },
-  macroGroup: { gap: spacing.lg },
+  eyebrow: { ...text.eyebrow, marginTop: 3 },
+  headingRow: { alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' },
+  headingText: { flex: 1 },
+  insight: {
+    backgroundColor: colors.surfaceContainer,
+    borderColor: colors.surfaceHighest,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: spacing.md,
+    overflow: 'hidden',
+    padding: spacing.lg,
+  },
+  insightBody: { flex: 1, gap: spacing.xs },
+  /** Sağ üst köşedeki mor parıltı — tasarımın cam efektini taklit ediyor. */
+  insightGlow: {
+    backgroundColor: colors.accentSurface,
+    borderRadius: radius.pill,
+    height: 110,
+    position: 'absolute',
+    right: -34,
+    top: -44,
+    width: 110,
+  },
+  insightIcon: {
+    alignItems: 'center',
+    backgroundColor: colors.accentSurface,
+    borderColor: colors.accentStrong,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
+  },
+  insightLabel: {
+    color: colors.accent,
+    fontFamily: fonts.bold,
+    fontSize: 11,
+    letterSpacing: tracking.wide,
+  },
+  insightText: { ...text.body, fontFamily: fonts.medium, lineHeight: 22 },
+  link: { alignItems: 'center', flexDirection: 'row', gap: 2 },
+  linkText: {
+    color: colors.accent,
+    fontFamily: fonts.bold,
+    fontSize: typography.small,
+    letterSpacing: tracking.wide,
+  },
+  logo: {
+    alignItems: 'center',
+    backgroundColor: colors.accentSurface,
+    borderRadius: radius.sm,
+    height: 30,
+    justifyContent: 'center',
+    width: 30,
+  },
+  macroGrid: { gap: spacing.md },
+  macroRow: { flexDirection: 'row', gap: spacing.md },
   navButton: {
     alignItems: 'center',
     backgroundColor: colors.surfaceContainer,
     borderRadius: radius.pill,
-    height: 34,
+    height: 32,
     justifyContent: 'center',
-    width: 34,
+    width: 32,
   },
   navButtonDisabled: { opacity: 0.35 },
   pressed: { opacity: 0.7 },
   section: { gap: spacing.md },
   sectionHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
   sectionLabel: text.sectionLabel,
-  tipCard: {
-    backgroundColor: colors.surfaceContainer,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    gap: spacing.sm,
-    overflow: 'hidden',
-    padding: spacing.lg,
-  },
-  /** Köşedeki mor parıltı; kartı diğerlerinden ayıran tek dekoratif öğe. */
-  tipGlow: {
-    backgroundColor: colors.accentSurface,
-    borderRadius: radius.pill,
-    height: 120,
-    position: 'absolute',
-    right: -50,
-    top: -60,
-    width: 120,
-  },
-  tipLabel: {
-    color: colors.accent,
-    fontFamily: fonts.bold,
-    fontSize: typography.small,
-    letterSpacing: tracking.wide,
-  },
-  tipSummary: { ...text.caption, lineHeight: 20 },
-  tipTitle: { ...text.title, lineHeight: 26 },
   title: {
     color: colors.text,
     fontFamily: fonts.black,
-    fontSize: typography.heading,
+    fontSize: 34,
     letterSpacing: tracking.tight,
-    textTransform: 'uppercase',
-  },
-  todayButton: {
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: colors.accentSurface,
-    borderRadius: radius.pill,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  todayButtonText: {
-    color: colors.accent,
-    fontFamily: fonts.bold,
-    fontSize: typography.small,
-    letterSpacing: tracking.wide,
+    lineHeight: 36,
   },
 });
