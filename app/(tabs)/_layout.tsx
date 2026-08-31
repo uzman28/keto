@@ -42,23 +42,23 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="recipes"
+        name="meals"
         options={{
-          title: 'Tarifler',
+          title: 'Öğünler',
           tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="restaurant" />,
         }}
       />
       <Tabs.Screen
-        name="guide"
+        name="progress"
         options={{
-          title: 'Rehber',
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="book" />,
+          title: 'İlerleme',
+          tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="stats-chart" />,
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="profile"
         options={{
-          title: 'Ayarlar',
+          title: 'Profil',
           tabBarIcon: ({ focused }) => <TabIcon focused={focused} name="person" />,
         }}
       />
@@ -71,7 +71,7 @@ function TabIcon({
   name,
 }: {
   focused: boolean;
-  name: 'grid' | 'restaurant' | 'book' | 'person';
+  name: 'grid' | 'restaurant' | 'stats-chart' | 'person';
 }) {
   return (
     <View style={[styles.icon, focused && styles.iconActive]}>

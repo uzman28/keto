@@ -3,6 +3,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { AppHeader } from '../../src/components/AppHeader';
 import { CalorieRing } from '../../src/components/CalorieRing';
 import { FoodTile } from '../../src/components/FoodTile';
 import { MacroCardLarge, MacroCardSmall } from '../../src/components/MacroCards';
@@ -81,39 +82,34 @@ export default function HomeScreen() {
 
   return (
     <Screen contentStyle={styles.content}>
-      {/* Üst çubuk: logo karesi + uygulama adı + gün gezintisi */}
-      <View style={styles.appBar}>
-        <View style={styles.brand}>
-          <View style={styles.logo}>
-            <Ionicons color={colors.accent} name="flash" size={16} />
+      <AppHeader
+        right={
+          <View style={styles.dateNav}>
+            <Pressable
+              accessibilityLabel="Önceki gün"
+              accessibilityRole="button"
+              hitSlop={spacing.sm}
+              onPress={() => setSelectedDate(addDays(selectedDate, -1))}
+              style={({ pressed }) => [styles.navButton, pressed && styles.pressed]}>
+              <Ionicons color={colors.textMuted} name="chevron-back" size={17} />
+            </Pressable>
+            <Pressable
+              accessibilityLabel="Sonraki gün"
+              accessibilityRole="button"
+              disabled={isViewingToday}
+              hitSlop={spacing.sm}
+              onPress={() => setSelectedDate(addDays(selectedDate, 1))}
+              style={({ pressed }) => [
+                styles.navButton,
+                isViewingToday && styles.navButtonDisabled,
+                pressed && styles.pressed,
+              ]}>
+              <Ionicons color={colors.textMuted} name="chevron-forward" size={17} />
+            </Pressable>
           </View>
-          <Text style={styles.brandText}>KETO</Text>
-        </View>
-
-        <View style={styles.dateNav}>
-          <Pressable
-            accessibilityLabel="Önceki gün"
-            accessibilityRole="button"
-            hitSlop={spacing.sm}
-            onPress={() => setSelectedDate(addDays(selectedDate, -1))}
-            style={({ pressed }) => [styles.navButton, pressed && styles.pressed]}>
-            <Ionicons color={colors.textMuted} name="chevron-back" size={17} />
-          </Pressable>
-          <Pressable
-            accessibilityLabel="Sonraki gün"
-            accessibilityRole="button"
-            disabled={isViewingToday}
-            hitSlop={spacing.sm}
-            onPress={() => setSelectedDate(addDays(selectedDate, 1))}
-            style={({ pressed }) => [
-              styles.navButton,
-              isViewingToday && styles.navButtonDisabled,
-              pressed && styles.pressed,
-            ]}>
-            <Ionicons color={colors.textMuted} name="chevron-forward" size={17} />
-          </Pressable>
-        </View>
-      </View>
+        }
+        title="Panel"
+      />
 
       {/* Başlık bloğu + durum rozeti */}
       <View style={styles.headingRow}>
@@ -264,7 +260,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  appBar: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
   badge: {
     alignItems: 'center',
     backgroundColor: colors.accentSurface,
@@ -284,7 +279,6 @@ const styles = StyleSheet.create({
     letterSpacing: tracking.wide,
   },
   badgeTextDanger: { color: colors.danger },
-  brand: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm },
   brandText: {
     color: colors.text,
     fontFamily: fonts.black,

@@ -1,12 +1,13 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { FilterChip } from '../../src/components/FilterChip';
-import { Screen } from '../../src/components/Screen';
-import { articles } from '../../src/data/articles';
-import { colors, fonts, radius, spacing, tracking, typography } from '../../src/theme';
-import type { Article } from '../../src/types';
+import { FilterChip } from '../src/components/FilterChip';
+import { Screen } from '../src/components/Screen';
+import { articles } from '../src/data/articles';
+import { colors, fonts, radius, spacing, tracking, typography } from '../src/theme';
+import type { Article } from '../src/types';
 
 type CategoryFilter = 'all' | Article['category'];
 
@@ -34,7 +35,12 @@ export default function GuideScreen() {
   );
 
   return (
-    <Screen>
+    <Screen withBottomInset>
+      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons color={colors.accent} name="chevron-back" size={20} />
+        <Text style={styles.backText}>GERİ</Text>
+      </Pressable>
+
       <View style={styles.heading}>
         <Text style={styles.title}>Rehber</Text>
         <Text style={styles.subtitle}>Keto hakkında bilmen gerekenler, kısa yazılar halinde.</Text>
@@ -77,6 +83,8 @@ export default function GuideScreen() {
 }
 
 const styles = StyleSheet.create({
+  backButton: { alignItems: 'center', alignSelf: 'flex-start', flexDirection: 'row', gap: 2 },
+  backText: { color: colors.accent, fontFamily: fonts.bold, fontSize: typography.small, letterSpacing: tracking.wide },
   card: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.sm, padding: spacing.lg },
   cardPressed: { opacity: 0.85 },
   cardSummary: { color: colors.textMuted, fontSize: typography.body, lineHeight: 23 },

@@ -229,3 +229,28 @@ export async function removeWeightEntry(dateKey: string): Promise<WeightEntry[]>
     return entries;
   }
 }
+
+const WEIGHT_GOAL_KEY = '@keto/weight-goal';
+
+/** Hedef kilo profilde tutulmuyor; onboarding'i değiştirmemek için ayrı anahtar. */
+export async function getWeightGoal(): Promise<number | null> {
+  try {
+    const saved = await AsyncStorage.getItem(WEIGHT_GOAL_KEY);
+    if (!saved) {
+      return null;
+    }
+    const parsed = Number(saved);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveWeightGoal(weightKg: number): Promise<boolean> {
+  try {
+    await AsyncStorage.setItem(WEIGHT_GOAL_KEY, String(weightKg));
+    return true;
+  } catch {
+    return false;
+  }
+}

@@ -83,6 +83,8 @@ function RootNavigator() {
         <Stack.Screen name="foods" />
         <Stack.Screen name="add-entry" />
         <Stack.Screen name="weight" />
+        <Stack.Screen name="recipes" />
+        <Stack.Screen name="guide" />
       </Stack>
     </>
   );

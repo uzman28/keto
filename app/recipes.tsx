@@ -1,14 +1,15 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { FilterChip } from '../../src/components/FilterChip';
-import { RecipeCard } from '../../src/components/RecipeCard';
-import { Screen } from '../../src/components/Screen';
-import { recipes } from '../../src/data/recipes';
-import { getFavorites, toggleFavorite } from '../../src/storage';
-import { colors, fonts, spacing, tracking, typography } from '../../src/theme';
-import type { MealType } from '../../src/types';
+import { FilterChip } from '../src/components/FilterChip';
+import { RecipeCard } from '../src/components/RecipeCard';
+import { Screen } from '../src/components/Screen';
+import { recipes } from '../src/data/recipes';
+import { getFavorites, toggleFavorite } from '../src/storage';
+import { colors, fonts, spacing, tracking, typography } from '../src/theme';
+import type { MealType } from '../src/types';
 
 type CarbFilter = 'all' | 'under-10' | 'under-5';
 type MealFilter = 'all' | MealType;
@@ -68,7 +69,12 @@ export default function RecipesScreen() {
   }
 
   return (
-    <Screen>
+    <Screen withBottomInset>
+      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons color={colors.accent} name="chevron-back" size={20} />
+        <Text style={styles.backText}>GERİ</Text>
+      </Pressable>
+
       <Text style={styles.title}>Tarifler</Text>
 
       <View style={styles.filterGroup}>
@@ -159,6 +165,8 @@ function RecipeSection({
 }
 
 const styles = StyleSheet.create({
+  backButton: { alignItems: 'center', alignSelf: 'flex-start', flexDirection: 'row', gap: 2 },
+  backText: { color: colors.accent, fontFamily: fonts.bold, fontSize: typography.small, letterSpacing: tracking.wide },
   chipRow: { flexDirection: 'row', gap: spacing.sm },
   // Yatay çip listesi ekranın kenarına kadar kaysın diye sayfa boşluğunu iptal edip kendi içinde veriyoruz.
   chipScrollContent: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.xl },
