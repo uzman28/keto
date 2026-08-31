@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, fonts, radius, spacing, typography } from '../theme';
 
 interface FilterChipProps {
   label: string;
@@ -23,7 +23,7 @@ export function FilterChip({ label, onPress, selected }: FilterChipProps) {
 const styles = StyleSheet.create({
   chip: { borderColor: colors.border, borderRadius: radius.pill, borderWidth: 1, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
   chipSelected: { backgroundColor: colors.accent, borderColor: colors.accent },
-  label: { color: colors.textMuted, fontSize: typography.small, fontWeight: '600' },
+  label: { color: colors.textMuted, fontSize: typography.small, fontFamily: fonts.medium },
   labelSelected: { color: colors.background },
   pressed: { opacity: 0.8 },
 });

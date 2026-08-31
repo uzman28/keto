@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, fonts, radius, spacing, typography } from '../theme';
 
 interface SelectableOptionProps {
   description?: string;
@@ -56,5 +56,5 @@ const styles = StyleSheet.create({
   },
   optionPressed: { opacity: 0.82 },
   optionSelected: { backgroundColor: colors.accentSurface, borderColor: colors.accent },
-  title: { color: colors.text, fontSize: typography.body, fontWeight: '600' },
+  title: { color: colors.text, fontSize: typography.body, fontFamily: fonts.medium },
 });

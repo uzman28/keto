@@ -5,7 +5,7 @@ import { Screen } from '../../src/components/Screen';
 import { calculateMacros } from '../../src/macros';
 import { useProfile } from '../../src/profile-context';
 import { clearProfile } from '../../src/storage';
-import { colors, radius, spacing, typography } from '../../src/theme';
+import { colors, fonts, radius, spacing, tracking, typography } from '../../src/theme';
 import type { ActivityLevel, Goal } from '../../src/types';
 
 const activityLabels: Record<ActivityLevel, string> = {
@@ -136,18 +136,24 @@ const styles = StyleSheet.create({
   actions: { gap: spacing.md },
   card: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, overflow: 'hidden' },
   dangerButton: { alignItems: 'center', borderColor: colors.danger, borderRadius: radius.md, borderWidth: 1, padding: spacing.lg },
-  dangerButtonText: { color: colors.danger, fontSize: typography.body, fontWeight: '700' },
+  dangerButtonText: { color: colors.danger, fontSize: typography.body, fontFamily: fonts.bold },
   footnote: { color: colors.textMuted, fontSize: typography.small, lineHeight: 19, textAlign: 'center' },
   pressed: { opacity: 0.8 },
   primaryButton: { alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.md, padding: spacing.lg },
-  primaryButtonText: { color: colors.background, fontSize: typography.body, fontWeight: '700' },
+  primaryButtonText: { color: colors.background, fontSize: typography.body, fontFamily: fonts.bold },
   row: { alignItems: 'center', flexDirection: 'row', gap: spacing.md, justifyContent: 'space-between', paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
   rowLabel: { color: colors.textMuted, flex: 1, fontSize: typography.body },
-  rowValue: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
+  rowValue: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold },
   rowValueHighlighted: { color: colors.accent },
   secondaryButton: { alignItems: 'center', borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, padding: spacing.lg },
-  secondaryButtonText: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
+  secondaryButtonText: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold },
   section: { gap: spacing.md },
-  sectionTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700' },
-  title: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
+  sectionTitle: { color: colors.text, fontSize: typography.section, fontFamily: fonts.bold },
+  title: {
+    color: colors.text,
+    fontFamily: fonts.black,
+    fontSize: typography.heading,
+    letterSpacing: tracking.tight,
+    textTransform: 'uppercase',
+  },
 });

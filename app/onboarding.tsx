@@ -16,7 +16,7 @@ import { LabeledInput } from '../src/components/LabeledInput';
 import { SelectableOption } from '../src/components/SelectableOption';
 import { useProfile } from '../src/profile-context';
 import { saveProfile } from '../src/storage';
-import { colors, radius, spacing, typography } from '../src/theme';
+import { colors, fonts, radius, spacing, typography } from '../src/theme';
 import type { ActivityLevel, Gender, Goal } from '../src/types';
 
 const activityOptions: Array<{ description: string; title: string; value: ActivityLevel }> = [
@@ -171,19 +171,19 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, paddingHorizontal: spacing.xl },
   error: { color: colors.danger, fontSize: typography.small, marginTop: spacing.xs },
-  eyebrow: { color: colors.accent, fontSize: typography.small, fontWeight: '700', letterSpacing: 1.2 },
+  eyebrow: { color: colors.accent, fontSize: typography.small, fontFamily: fonts.bold, letterSpacing: 1.2 },
   genderButton: { alignItems: 'center', borderRadius: radius.sm, flex: 1, padding: spacing.md },
   genderButtonSelected: { backgroundColor: colors.accent },
   genderGroup: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, flexDirection: 'row', padding: spacing.xs },
-  genderText: { color: colors.textMuted, fontSize: typography.body, fontWeight: '600' },
+  genderText: { color: colors.textMuted, fontSize: typography.body, fontFamily: fonts.medium },
   genderTextSelected: { color: colors.background },
   intro: { color: colors.textMuted, fontSize: typography.body, lineHeight: 24 },
   keyboardView: { backgroundColor: colors.background, flex: 1 },
-  label: { color: colors.text, fontSize: typography.body, fontWeight: '600' },
+  label: { color: colors.text, fontSize: typography.body, fontFamily: fonts.medium },
   optionList: { gap: spacing.sm },
   section: { gap: spacing.sm },
   submitButton: { alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.md, marginTop: spacing.sm, padding: spacing.lg },
   submitButtonDisabled: { opacity: 0.4 },
-  submitText: { color: colors.background, fontSize: typography.body, fontWeight: '700' },
-  title: { color: colors.text, fontSize: typography.heading, fontWeight: '700', lineHeight: 36 },
+  submitText: { color: colors.background, fontSize: typography.body, fontFamily: fonts.bold },
+  title: { color: colors.text, fontSize: typography.heading, fontFamily: fonts.bold, lineHeight: 36 },
 });

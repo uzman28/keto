@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { categoryLabels, verdictStyles } from '../food-meta';
 import { macrosForGrams } from '../macros';
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, fonts, radius, spacing, typography } from '../theme';
 import type { Food } from '../types';
 
 interface FoodRowProps {
@@ -64,15 +64,15 @@ export function FoodRow({ food, isExpanded, onToggle }: FoodRowProps) {
 
 const styles = StyleSheet.create({
   badge: { alignItems: 'center', alignSelf: 'flex-start', borderRadius: radius.pill, flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs },
-  badgeText: { fontSize: typography.small, fontWeight: '800' },
+  badgeText: { fontSize: typography.small, fontFamily: fonts.black },
   detail: { borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth, gap: spacing.sm, marginTop: spacing.md, paddingTop: spacing.md },
   dot: { borderRadius: radius.pill, height: 10, marginTop: 5, width: 10 },
   header: { alignItems: 'flex-start', flexDirection: 'row', gap: spacing.md },
   headerText: { flex: 1, gap: 2 },
   meta: { color: colors.textMuted, fontSize: typography.small },
-  name: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
+  name: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold },
   portionRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm },
-  portionText: { color: colors.text, flex: 1, fontSize: typography.small, fontWeight: '600' },
+  portionText: { color: colors.text, flex: 1, fontSize: typography.small, fontFamily: fonts.medium },
   pressed: { opacity: 0.85 },
   row: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, padding: spacing.lg },
   why: { color: colors.textMuted, fontSize: typography.small, lineHeight: 20 },

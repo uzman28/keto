@@ -3,6 +3,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { CalorieRing } from '../../src/components/CalorieRing';
 import { FoodTile } from '../../src/components/FoodTile';
 import { MacroBar } from '../../src/components/MacroBar';
 import { Screen } from '../../src/components/Screen';
@@ -19,7 +20,7 @@ import {
   getWaterForDate,
   removeLogEntry,
 } from '../../src/storage';
-import { colors, radius, spacing, typography } from '../../src/theme';
+import { colors, fonts, radius, spacing, text, tracking, typography } from '../../src/theme';
 import type { LogEntry } from '../../src/types';
 
 const disclaimer =
@@ -58,14 +59,15 @@ export default function HomeScreen() {
 
   const targets = calculateMacros(profile);
   const consumed = sumMacros(entries);
-  const remainingCalories = targets.calories - consumed.kcal;
   const dayOfYear = getDayOfYear(selectedDate);
   const dailyTip = articles[dayOfYear % articles.length];
   const featuredFood = foods[dayOfYear % foods.length];
-  // Vitrin her gun kayarak farkli besinleri one cikarsin diye gunden turetiliyor.
+  // Vitrin her gün kayarak farklı besinleri öne çıkarsın diye günden türetiliyor.
   const deckFoods = [
     featuredFood,
-    ...foods.filter((food) => food.id !== featuredFood.id).slice(dayOfYear % 20, (dayOfYear % 20) + 9),
+    ...foods
+      .filter((food) => food.id !== featuredFood.id)
+      .slice(dayOfYear % 20, (dayOfYear % 20) + 9),
   ];
 
   async function handleRemove(entryId: string) {
@@ -78,34 +80,35 @@ export default function HomeScreen() {
 
   return (
     <Screen>
-      <View style={styles.dateRow}>
-        <Pressable
-          accessibilityLabel="Önceki gün"
-          accessibilityRole="button"
-          hitSlop={spacing.sm}
-          onPress={() => setSelectedDate(addDays(selectedDate, -1))}
-          style={({ pressed }) => [styles.dateArrow, pressed && styles.pressed]}>
-          <Ionicons color={colors.text} name="chevron-back" size={20} />
-        </Pressable>
-
-        <View style={styles.dateLabels}>
-          <Text style={styles.greeting}>{isViewingToday ? 'Bugün' : 'Geçmiş gün'}</Text>
-          <Text style={styles.summary}>{formatDayLabel(selectedDate)}</Text>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.title}>{isViewingToday ? 'Bugün' : 'Geçmiş'}</Text>
+          <Text style={styles.eyebrow}>{formatDayLabel(selectedDate)}</Text>
         </View>
 
-        <Pressable
-          accessibilityLabel="Sonraki gün"
-          accessibilityRole="button"
-          disabled={isViewingToday}
-          hitSlop={spacing.sm}
-          onPress={() => setSelectedDate(addDays(selectedDate, 1))}
-          style={({ pressed }) => [
-            styles.dateArrow,
-            isViewingToday && styles.dateArrowDisabled,
-            pressed && styles.pressed,
-          ]}>
-          <Ionicons color={colors.text} name="chevron-forward" size={20} />
-        </Pressable>
+        <View style={styles.dateNav}>
+          <Pressable
+            accessibilityLabel="Önceki gün"
+            accessibilityRole="button"
+            hitSlop={spacing.sm}
+            onPress={() => setSelectedDate(addDays(selectedDate, -1))}
+            style={({ pressed }) => [styles.navButton, pressed && styles.pressed]}>
+            <Ionicons color={colors.textMuted} name="chevron-back" size={18} />
+          </Pressable>
+          <Pressable
+            accessibilityLabel="Sonraki gün"
+            accessibilityRole="button"
+            disabled={isViewingToday}
+            hitSlop={spacing.sm}
+            onPress={() => setSelectedDate(addDays(selectedDate, 1))}
+            style={({ pressed }) => [
+              styles.navButton,
+              isViewingToday && styles.navButtonDisabled,
+              pressed && styles.pressed,
+            ]}>
+            <Ionicons color={colors.textMuted} name="chevron-forward" size={18} />
+          </Pressable>
+        </View>
       </View>
 
       {!isViewingToday ? (
@@ -113,34 +116,14 @@ export default function HomeScreen() {
           accessibilityRole="button"
           onPress={goToToday}
           style={({ pressed }) => [styles.todayButton, pressed && styles.pressed]}>
-          <Text style={styles.todayButtonText}>Bugüne dön</Text>
+          <Text style={styles.todayButtonText}>BUGÜNE DÖN</Text>
         </Pressable>
       ) : null}
 
-      <View style={styles.calorieCard}>
-        <Text style={styles.calorieLabel}>
-          {remainingCalories >= 0 ? 'KALAN KALORİ' : 'HEDEF AŞILDI'}
-        </Text>
-        <Text style={[styles.calorieValue, remainingCalories < 0 && styles.calorieValueOver]}>
-          {Math.abs(remainingCalories)}
-        </Text>
-        <Text style={styles.calorieUnit}>
-          {consumed.kcal} / {targets.calories} kcal alındı
-        </Text>
-        <View style={styles.calorieTrack}>
-          <View
-            style={[
-              styles.calorieFill,
-              {
-                backgroundColor: remainingCalories < 0 ? colors.danger : colors.accent,
-                width: `${Math.min(consumed.kcal / targets.calories, 1) * 100}%`,
-              },
-            ]}
-          />
-        </View>
-      </View>
+      <CalorieRing consumed={consumed.kcal} target={targets.calories} />
 
-      <View style={styles.macroCard}>
+      {/* Makrolar kutusuz akıyor — ayrımı boşluk yapıyor, çerçeve değil. */}
+      <View style={styles.macroGroup}>
         <MacroBar consumed={consumed.fatG} target={targets.fatG} title="Yağ" unit="g" />
         <MacroBar consumed={consumed.proteinG} target={targets.proteinG} title="Protein" unit="g" />
         <MacroBar
@@ -156,35 +139,32 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{isViewingToday ? 'Bugün yediklerin' : 'O gün yedikleri'}</Text>
+          <Text style={styles.sectionLabel}>
+            {isViewingToday ? 'BUGÜN YEDİKLERİN' : 'O GÜN YEDİKLERİ'}
+          </Text>
           <Pressable
             accessibilityRole="button"
             onPress={() => router.push('/add-entry')}
             style={({ pressed }) => [styles.addLink, pressed && styles.pressed]}>
-            <Ionicons color={colors.accent} name="add" size={16} />
-            <Text style={styles.addLinkText}>Ekle</Text>
+            <Ionicons color={colors.accent} name="add" size={15} />
+            <Text style={styles.addLinkText}>EKLE</Text>
           </Pressable>
         </View>
 
         {entries.length === 0 ? (
           <View style={styles.emptyCard}>
-            <Ionicons color={colors.textMuted} name="restaurant-outline" size={28} />
+            <Ionicons color={colors.textFaint} name="restaurant-outline" size={26} />
             <Text style={styles.emptyTitle}>Kayıt yok</Text>
             <Text style={styles.emptyText}>
-              Yukarıdaki "Ekle" ile yiyecek arayabilir, tariflerden seçebilir ya da
-              değerleri kendin girebilirsin.
+              Yukarıdaki "Ekle" ile yiyecek arayabilir, tariflerden seçebilir ya da değerleri
+              kendin girebilirsin.
             </Text>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.push('/recipes')}
-              style={({ pressed }) => pressed && styles.pressed}>
-              <Text style={styles.emptyLink}>Tariflere git →</Text>
-            </Pressable>
           </View>
         ) : (
           <View style={styles.entryList}>
             {entries.map((entry, index) => (
               <View key={entry.id} style={[styles.entryRow, index > 0 && styles.entryRowDivider]}>
+                <View style={styles.entryAccent} />
                 <View style={styles.entryInfo}>
                   <Text numberOfLines={1} style={styles.entryTitle}>
                     {entry.title}
@@ -201,7 +181,7 @@ export default function HomeScreen() {
                   hitSlop={spacing.sm}
                   onPress={() => void handleRemove(entry.id)}
                   style={({ pressed }) => pressed && styles.pressed}>
-                  <Ionicons color={colors.textMuted} name="close-circle-outline" size={24} />
+                  <Ionicons color={colors.textFaint} name="close" size={18} />
                 </Pressable>
               </View>
             ))}
@@ -211,13 +191,13 @@ export default function HomeScreen() {
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Ketoya uygun mu?</Text>
+          <Text style={styles.sectionLabel}>KETOYA UYGUN MU?</Text>
           <Pressable
             accessibilityRole="button"
             onPress={() => router.push('/foods')}
             style={({ pressed }) => [styles.addLink, pressed && styles.pressed]}>
-            <Text style={styles.addLinkText}>Tüm besinler</Text>
-            <Ionicons color={colors.accent} name="chevron-forward" size={14} />
+            <Text style={styles.addLinkText}>TÜMÜ</Text>
+            <Ionicons color={colors.accent} name="chevron-forward" size={13} />
           </Pressable>
         </View>
 
@@ -241,10 +221,10 @@ export default function HomeScreen() {
         accessibilityRole="button"
         onPress={() => router.push({ pathname: '/article/[id]', params: { id: dailyTip.id } })}
         style={({ pressed }) => [styles.tipCard, pressed && styles.pressed]}>
+        <View style={styles.tipGlow} />
         <Text style={styles.tipLabel}>GÜNÜN İPUCU</Text>
         <Text style={styles.tipTitle}>{dailyTip.title}</Text>
         <Text style={styles.tipSummary}>{dailyTip.summary}</Text>
-        <Text style={styles.tipLink}>Oku →</Text>
       </Pressable>
 
       <Text style={styles.disclaimer}>{disclaimer}</Text>
@@ -253,52 +233,114 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  addLink: { alignItems: 'center', flexDirection: 'row', gap: spacing.xs },
-  addLinkText: { color: colors.accent, fontSize: typography.small, fontWeight: '700' },
-  calorieCard: {
+  addLink: { alignItems: 'center', flexDirection: 'row', gap: 2 },
+  addLinkText: {
+    color: colors.accent,
+    fontFamily: fonts.bold,
+    fontSize: typography.small,
+    letterSpacing: tracking.wide,
+  },
+  dateNav: { flexDirection: 'row', gap: spacing.sm },
+  deckContent: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.xl },
+  deckScroller: { marginHorizontal: -spacing.xl },
+  disclaimer: {
+    color: colors.textFaint,
+    fontFamily: fonts.regular,
+    fontSize: 11,
+    lineHeight: 17,
+    textAlign: 'center',
+  },
+  emptyCard: {
     alignItems: 'center',
-    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    gap: spacing.sm,
+    padding: spacing.xl,
+  },
+  emptyText: { ...text.caption, color: colors.textFaint, lineHeight: 19, textAlign: 'center' },
+  emptyTitle: { ...text.title, fontSize: typography.body },
+  /** Sol kenardaki ince mor şerit — kayıtları listeden ayıran imza detay. */
+  entryAccent: { backgroundColor: colors.accent, borderRadius: radius.pill, height: 28, width: 2 },
+  entryInfo: { flex: 1, gap: 3 },
+  entryList: {
+    backgroundColor: colors.surfaceContainer,
+    borderRadius: radius.md,
+    overflow: 'hidden',
+  },
+  entryMeta: { ...text.caption, color: colors.textFaint },
+  entryRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  entryRowDivider: { borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth },
+  entryTitle: { color: colors.text, fontFamily: fonts.bold, fontSize: typography.body },
+  eyebrow: { ...text.eyebrow, marginTop: 2 },
+  header: { alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' },
+  macroGroup: { gap: spacing.lg },
+  navButton: {
+    alignItems: 'center',
+    backgroundColor: colors.surfaceContainer,
+    borderRadius: radius.pill,
+    height: 34,
+    justifyContent: 'center',
+    width: 34,
+  },
+  navButtonDisabled: { opacity: 0.35 },
+  pressed: { opacity: 0.7 },
+  section: { gap: spacing.md },
+  sectionHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
+  sectionLabel: text.sectionLabel,
+  tipCard: {
+    backgroundColor: colors.surfaceContainer,
     borderColor: colors.border,
     borderRadius: radius.md,
     borderWidth: 1,
-    gap: spacing.xs,
-    padding: spacing.xl,
+    gap: spacing.sm,
+    overflow: 'hidden',
+    padding: spacing.lg,
   },
-  calorieFill: { borderRadius: radius.pill, height: '100%' },
-  calorieLabel: { color: colors.textMuted, fontSize: typography.small, fontWeight: '700', letterSpacing: 1 },
-  calorieTrack: { backgroundColor: colors.surfaceElevated, borderRadius: radius.pill, height: 10, marginTop: spacing.sm, overflow: 'hidden', width: '100%' },
-  calorieUnit: { color: colors.textMuted, fontSize: typography.body },
-  calorieValue: { color: colors.text, fontSize: typography.display, fontWeight: '800', lineHeight: 66 },
-  calorieValueOver: { color: colors.danger },
-  dateArrow: { alignItems: 'center', borderColor: colors.border, borderRadius: radius.pill, borderWidth: 1, height: 40, justifyContent: 'center', width: 40 },
-  dateArrowDisabled: { opacity: 0.3 },
-  dateLabels: { alignItems: 'center', flex: 1, gap: spacing.xs },
-  dateRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.md },
-  deckContent: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.xl },
-  deckScroller: { marginHorizontal: -spacing.xl },
-  disclaimer: { color: colors.textMuted, fontSize: typography.small, lineHeight: 19, textAlign: 'center' },
-  emptyCard: { alignItems: 'center', backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderStyle: 'dashed', borderWidth: 1, gap: spacing.sm, padding: spacing.xl },
-  emptyLink: { color: colors.accent, fontSize: typography.small, fontWeight: '700', marginTop: spacing.xs },
-  emptyText: { color: colors.textMuted, fontSize: typography.small, lineHeight: 19, textAlign: 'center' },
-  emptyTitle: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
-  entryInfo: { flex: 1, gap: spacing.xs },
-  entryList: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, overflow: 'hidden' },
-  entryMeta: { color: colors.textMuted, fontSize: typography.small },
-  entryRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.md, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
-  entryRowDivider: { borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth },
-  entryTitle: { color: colors.text, fontSize: typography.body, fontWeight: '600' },
-  greeting: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
-  macroCard: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.lg, padding: spacing.lg },
-  pressed: { opacity: 0.8 },
-  section: { gap: spacing.md },
-  sectionHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
-  sectionTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700' },
-  summary: { color: colors.textMuted, fontSize: typography.small },
-  tipCard: { backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.sm, padding: spacing.lg },
-  tipLabel: { color: colors.accent, fontSize: typography.small, fontWeight: '700', letterSpacing: 1 },
-  tipLink: { color: colors.accent, fontSize: typography.small, fontWeight: '700', marginTop: spacing.xs },
-  tipSummary: { color: colors.textMuted, fontSize: typography.body, lineHeight: 23 },
-  tipTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700', lineHeight: 27 },
-  todayButton: { alignItems: 'center', borderColor: colors.accent, borderRadius: radius.pill, borderWidth: 1, paddingVertical: spacing.sm },
-  todayButtonText: { color: colors.accent, fontSize: typography.small, fontWeight: '700' },
+  /** Köşedeki mor parıltı; kartı diğerlerinden ayıran tek dekoratif öğe. */
+  tipGlow: {
+    backgroundColor: colors.accentSurface,
+    borderRadius: radius.pill,
+    height: 120,
+    position: 'absolute',
+    right: -50,
+    top: -60,
+    width: 120,
+  },
+  tipLabel: {
+    color: colors.accent,
+    fontFamily: fonts.bold,
+    fontSize: typography.small,
+    letterSpacing: tracking.wide,
+  },
+  tipSummary: { ...text.caption, lineHeight: 20 },
+  tipTitle: { ...text.title, lineHeight: 26 },
+  title: {
+    color: colors.text,
+    fontFamily: fonts.black,
+    fontSize: typography.heading,
+    letterSpacing: tracking.tight,
+    textTransform: 'uppercase',
+  },
+  todayButton: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: colors.accentSurface,
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  todayButtonText: {
+    color: colors.accent,
+    fontFamily: fonts.bold,
+    fontSize: typography.small,
+    letterSpacing: tracking.wide,
+  },
 });

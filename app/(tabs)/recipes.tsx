@@ -7,7 +7,7 @@ import { RecipeCard } from '../../src/components/RecipeCard';
 import { Screen } from '../../src/components/Screen';
 import { recipes } from '../../src/data/recipes';
 import { getFavorites, toggleFavorite } from '../../src/storage';
-import { colors, spacing, typography } from '../../src/theme';
+import { colors, fonts, spacing, tracking, typography } from '../../src/theme';
 import type { MealType } from '../../src/types';
 
 type CarbFilter = 'all' | 'under-10' | 'under-5';
@@ -165,9 +165,15 @@ const styles = StyleSheet.create({
   chipScroller: { marginHorizontal: -spacing.xl },
   emptyText: { color: colors.textMuted, fontSize: typography.body, textAlign: 'center' },
   filterGroup: { gap: spacing.sm },
-  filterLabel: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
+  filterLabel: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold },
   recipeSections: { gap: spacing.xl },
   section: { gap: spacing.md },
-  sectionTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700' },
-  title: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
+  sectionTitle: { color: colors.text, fontSize: typography.section, fontFamily: fonts.bold },
+  title: {
+    color: colors.text,
+    fontFamily: fonts.black,
+    fontSize: typography.heading,
+    letterSpacing: tracking.tight,
+    textTransform: 'uppercase',
+  },
 });

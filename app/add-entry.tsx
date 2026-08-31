@@ -23,7 +23,7 @@ import { isRemoteSearchEnabled, searchRemoteFoods } from '../src/food-remote';
 import type { RemoteFood, RemoteFoodResult } from '../src/food-remote';
 import { macrosForGrams } from '../src/macros';
 import { addLogEntry, createEntryId } from '../src/storage';
-import { colors, radius, spacing, typography } from '../src/theme';
+import { colors, fonts, radius, spacing, tracking, typography } from '../src/theme';
 
 /** Her tuşta ağ isteği atmamak için — yazmayı bırakınca aranıyor. */
 const REMOTE_DEBOUNCE_MS = 350;
@@ -364,7 +364,7 @@ function ManualTab({ bottomInset, dateKey }: { bottomInset: number; dateKey: str
 const styles = StyleSheet.create({
   closeButton: { alignItems: 'center', backgroundColor: colors.surface, borderRadius: radius.pill, height: 36, justifyContent: 'center', width: 36 },
   content: { gap: spacing.lg, paddingHorizontal: spacing.xl, paddingTop: spacing.lg },
-  dayTag: { color: colors.accent, fontSize: typography.small, fontWeight: '700' },
+  dayTag: { color: colors.accent, fontSize: typography.small, fontFamily: fonts.bold },
   error: { color: colors.danger, fontSize: typography.small, marginTop: -spacing.xs },
   header: { backgroundColor: colors.background, gap: spacing.lg, paddingBottom: spacing.md, paddingHorizontal: spacing.xl },
   headerTop: { alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'space-between' },
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
   hint: { color: colors.textMuted, fontSize: typography.small },
   hintCard: { alignItems: 'center', backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderStyle: 'dashed', borderWidth: 1, gap: spacing.sm, padding: spacing.xl },
   hintText: { color: colors.textMuted, fontSize: typography.small, lineHeight: 19, textAlign: 'center' },
-  hintTitle: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
+  hintTitle: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold },
   intro: { color: colors.textMuted, fontSize: typography.body, lineHeight: 23 },
   keyboardView: { backgroundColor: colors.background, flex: 1 },
   pressed: { opacity: 0.8 },
@@ -382,11 +382,17 @@ const styles = StyleSheet.create({
   section: { gap: spacing.md },
   submitButton: { alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.md, padding: spacing.lg },
   submitButtonDisabled: { opacity: 0.4 },
-  submitText: { color: colors.background, fontSize: typography.body, fontWeight: '700' },
+  submitText: { color: colors.background, fontSize: typography.body, fontFamily: fonts.bold },
   tab: { alignItems: 'center', borderRadius: radius.sm, flex: 1, paddingVertical: spacing.sm },
   tabBar: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, flexDirection: 'row', padding: spacing.xs },
-  tabSelected: { backgroundColor: colors.surfaceElevated },
-  tabText: { color: colors.textMuted, fontSize: typography.body, fontWeight: '700' },
+  tabSelected: { backgroundColor: colors.surfaceHigh },
+  tabText: { color: colors.textMuted, fontSize: typography.body, fontFamily: fonts.bold },
   tabTextSelected: { color: colors.text },
-  title: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
+  title: {
+    color: colors.text,
+    fontFamily: fonts.black,
+    fontSize: typography.heading,
+    letterSpacing: tracking.tight,
+    textTransform: 'uppercase',
+  },
 });

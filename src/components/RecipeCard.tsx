@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, fonts, radius, spacing, typography } from '../theme';
 import type { MealType, Recipe } from '../types';
 
 interface RecipeCardProps {
@@ -81,7 +81,7 @@ export function RecipeCard({ isFavorite, onFavoritePress, onPress, recipe }: Rec
 const styles = StyleSheet.create({
   body: { gap: spacing.sm, padding: spacing.lg },
   carbBadge: { backgroundColor: colors.accentSurface, borderRadius: radius.pill, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs },
-  carbText: { color: colors.accent, fontSize: typography.small, fontWeight: '700' },
+  carbText: { color: colors.accent, fontSize: typography.small, fontFamily: fonts.bold },
   card: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, overflow: 'hidden' },
   cardPressed: { opacity: 0.85 },
   heartPressed: { opacity: 0.6 },
@@ -89,10 +89,10 @@ const styles = StyleSheet.create({
   image: { height: '100%', width: '100%' },
   imageContainer: { height: 168, position: 'relative' },
   imageContent: { alignItems: 'flex-start', bottom: spacing.lg, left: spacing.lg, position: 'absolute' },
-  mealLabel: { color: colors.text, fontSize: typography.small, fontWeight: '800', letterSpacing: 1, marginTop: spacing.sm },
+  mealLabel: { color: colors.text, fontSize: typography.small, fontFamily: fonts.black, letterSpacing: 1, marginTop: spacing.sm },
   meta: { color: colors.textMuted, fontSize: typography.small },
   metaRow: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   scrim: { backgroundColor: 'rgba(0, 0, 0, 0.35)', bottom: 0, left: 0, position: 'absolute', right: 0, top: 0 },
-  title: { color: colors.text, flex: 1, fontSize: typography.section, fontWeight: '700', lineHeight: 26 },
+  title: { color: colors.text, flex: 1, fontSize: typography.section, fontFamily: fonts.bold, lineHeight: 26 },
   titleRow: { alignItems: 'flex-start', flexDirection: 'row', gap: spacing.sm },
 });

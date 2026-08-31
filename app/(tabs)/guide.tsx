@@ -5,7 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { FilterChip } from '../../src/components/FilterChip';
 import { Screen } from '../../src/components/Screen';
 import { articles } from '../../src/data/articles';
-import { colors, radius, spacing, typography } from '../../src/theme';
+import { colors, fonts, radius, spacing, tracking, typography } from '../../src/theme';
 import type { Article } from '../../src/types';
 
 type CategoryFilter = 'all' | Article['category'];
@@ -80,15 +80,21 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.sm, padding: spacing.lg },
   cardPressed: { opacity: 0.85 },
   cardSummary: { color: colors.textMuted, fontSize: typography.body, lineHeight: 23 },
-  cardTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700', lineHeight: 27 },
+  cardTitle: { color: colors.text, fontSize: typography.section, fontFamily: fonts.bold, lineHeight: 27 },
   cardTopRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
-  category: { color: colors.accent, fontSize: typography.small, fontWeight: '800', letterSpacing: 1 },
+  category: { color: colors.accent, fontSize: typography.small, fontFamily: fonts.black, letterSpacing: 1 },
   chipScrollContent: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.xl },
   chipScroller: { marginHorizontal: -spacing.xl },
   heading: { gap: spacing.xs },
-  link: { color: colors.accent, fontSize: typography.small, fontWeight: '700', marginTop: spacing.xs },
+  link: { color: colors.accent, fontSize: typography.small, fontFamily: fonts.bold, marginTop: spacing.xs },
   list: { gap: spacing.md },
   readTime: { color: colors.textMuted, fontSize: typography.small },
   subtitle: { color: colors.textMuted, fontSize: typography.body, lineHeight: 23 },
-  title: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
+  title: {
+    color: colors.text,
+    fontFamily: fonts.black,
+    fontSize: typography.heading,
+    letterSpacing: tracking.tight,
+    textTransform: 'uppercase',
+  },
 });

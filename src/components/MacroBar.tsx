@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, fonts, radius, spacing, typography } from '../theme';
 
 interface MacroBarProps {
   consumed: number;
@@ -48,13 +48,13 @@ export function MacroBar({ consumed, isCeiling = false, title, target, unit }: M
 
 const styles = StyleSheet.create({
   amount: { color: colors.textMuted, fontSize: typography.small },
-  consumed: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
+  consumed: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold },
   container: { gap: spacing.xs },
   fill: { borderRadius: radius.pill, height: '100%' },
   labelRow: { alignItems: 'flex-end', flexDirection: 'row', justifyContent: 'space-between' },
   remaining: { color: colors.textMuted, fontSize: typography.small },
-  remainingOver: { color: colors.danger, fontWeight: '700' },
+  remainingOver: { color: colors.danger, fontFamily: fonts.bold },
   target: { color: colors.textMuted, fontSize: typography.small },
-  title: { color: colors.text, fontSize: typography.body, fontWeight: '600' },
-  track: { backgroundColor: colors.surfaceElevated, borderRadius: radius.pill, height: 10, overflow: 'hidden' },
+  title: { color: colors.text, fontSize: typography.body, fontFamily: fonts.medium },
+  track: { backgroundColor: colors.surfaceHigh, borderRadius: radius.pill, height: 10, overflow: 'hidden' },
 });

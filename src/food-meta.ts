@@ -14,8 +14,8 @@ export const verdictStyles: Record<FoodVerdict, VerdictStyle> = {
   serbest: {
     label: 'Serbest',
     shortLabel: 'Serbest',
-    color: colors.accent,
-    surface: colors.accentSurface,
+    color: colors.success,
+    surface: colors.successSurface,
     icon: 'checkmark-circle',
   },
   olculu: {
@@ -29,7 +29,7 @@ export const verdictStyles: Record<FoodVerdict, VerdictStyle> = {
     label: 'Kaçın',
     shortLabel: 'Kaçın',
     color: colors.danger,
-    surface: '#4A2020',
+    surface: colors.dangerSurface,
     icon: 'close-circle',
   },
 };

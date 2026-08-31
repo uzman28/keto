@@ -7,7 +7,7 @@ import { LabeledInput } from '../src/components/LabeledInput';
 import { WeightChart } from '../src/components/WeightChart';
 import { formatDayLabel, getDateKey } from '../src/date';
 import { getWeightEntries, removeWeightEntry, saveWeightEntry } from '../src/storage';
-import { colors, radius, spacing, typography } from '../src/theme';
+import { colors, fonts, radius, spacing, tracking, typography } from '../src/theme';
 import type { WeightEntry } from '../src/types';
 
 function parseWeight(value: string): number {
@@ -193,11 +193,11 @@ function SummaryTile({
 
 const styles = StyleSheet.create({
   backButton: { alignSelf: 'flex-start', paddingVertical: spacing.sm },
-  backText: { color: colors.accent, fontSize: typography.body, fontWeight: '700' },
+  backText: { color: colors.accent, fontSize: typography.body, fontFamily: fonts.bold },
   content: { gap: spacing.lg, paddingHorizontal: spacing.xl },
   emptyCard: { alignItems: 'center', backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderStyle: 'dashed', borderWidth: 1, gap: spacing.sm, padding: spacing.xl },
   emptyText: { color: colors.textMuted, fontSize: typography.small, lineHeight: 19, textAlign: 'center' },
-  emptyTitle: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
+  emptyTitle: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold },
   error: { color: colors.danger, fontSize: typography.small },
   headingGroup: { gap: spacing.sm },
   hint: { color: colors.textMuted, fontSize: typography.small },
@@ -207,18 +207,24 @@ const styles = StyleSheet.create({
   listDate: { color: colors.text, flex: 1, fontSize: typography.body },
   listRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.md, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
   listRowDivider: { borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth },
-  listValue: { color: colors.accent, fontSize: typography.body, fontWeight: '700' },
+  listValue: { color: colors.accent, fontSize: typography.body, fontFamily: fonts.bold },
   pressed: { opacity: 0.8 },
   section: { gap: spacing.md },
-  sectionTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700' },
+  sectionTitle: { color: colors.text, fontSize: typography.section, fontFamily: fonts.bold },
   submitButton: { alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.md, padding: spacing.lg },
   submitButtonDisabled: { opacity: 0.4 },
-  submitText: { color: colors.background, fontSize: typography.body, fontWeight: '700' },
+  submitText: { color: colors.background, fontSize: typography.body, fontFamily: fonts.bold },
   summaryRow: { flexDirection: 'row', gap: spacing.sm },
   tile: { alignItems: 'center', backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.sm, borderWidth: 1, flex: 1, gap: spacing.xs, paddingHorizontal: spacing.xs, paddingVertical: spacing.md },
   tileHighlighted: { backgroundColor: colors.accentSurface, borderColor: colors.accent },
   tileLabel: { color: colors.textMuted, fontSize: typography.small, textAlign: 'center' },
-  tileValue: { color: colors.text, fontSize: typography.body, fontWeight: '800' },
+  tileValue: { color: colors.text, fontSize: typography.body, fontFamily: fonts.black },
   tileValueHighlighted: { color: colors.accent },
-  title: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
+  title: {
+    color: colors.text,
+    fontFamily: fonts.black,
+    fontSize: typography.heading,
+    letterSpacing: tracking.tight,
+    textTransform: 'uppercase',
+  },
 });

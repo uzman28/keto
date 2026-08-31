@@ -5,7 +5,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { fetchRemoteFood } from '../food-remote';
 import type { RemoteFood, RemoteFoodResult } from '../food-remote';
 import { macrosForGrams } from '../macros';
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, fonts, radius, spacing, typography } from '../theme';
 
 interface RemoteFoodRowProps {
   isExpanded: boolean;
@@ -178,28 +178,28 @@ export function RemoteFoodRow({ isExpanded, onAdd, onToggle, result }: RemoteFoo
 
 const styles = StyleSheet.create({
   addButton: { alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.sm, padding: spacing.md },
-  addButtonText: { color: colors.background, fontSize: typography.body, fontWeight: '700' },
-  brand: { color: colors.textMuted, fontWeight: '400' },
+  addButtonText: { color: colors.background, fontSize: typography.body, fontFamily: fonts.bold },
+  brand: { color: colors.textMuted, fontFamily: fonts.regular },
   centerRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm },
-  counter: { alignItems: 'center', backgroundColor: colors.surfaceElevated, borderRadius: radius.pill, flexDirection: 'row', gap: spacing.md, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs },
+  counter: { alignItems: 'center', backgroundColor: colors.surfaceHigh, borderRadius: radius.pill, flexDirection: 'row', gap: spacing.md, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs },
   counterButton: { alignItems: 'center', height: 28, justifyContent: 'center', width: 28 },
   counterButtonDisabled: { opacity: 0.3 },
-  counterLabel: { color: colors.textMuted, fontSize: typography.small, fontWeight: '600' },
+  counterLabel: { color: colors.textMuted, fontSize: typography.small, fontFamily: fonts.medium },
   counterRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.md },
-  counterValue: { color: colors.text, fontSize: typography.body, fontWeight: '700', minWidth: 28, textAlign: 'center' },
+  counterValue: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold, minWidth: 28, textAlign: 'center' },
   detail: { borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth, gap: spacing.md, padding: spacing.lg },
   errorText: { color: colors.danger, fontSize: typography.small, lineHeight: 19 },
   gramsText: { color: colors.textMuted, fontSize: typography.small, marginLeft: 'auto' },
   header: { alignItems: 'center', flexDirection: 'row', gap: spacing.md, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
   headerText: { flex: 1, gap: 2 },
   loadingText: { color: colors.textMuted, fontSize: typography.small },
-  macroHighlight: { color: colors.accent, fontWeight: '700' },
+  macroHighlight: { color: colors.accent, fontFamily: fonts.bold },
   macroLine: { color: colors.textMuted, fontSize: typography.small, lineHeight: 19 },
   meta: { color: colors.textMuted, fontSize: typography.small },
-  name: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
+  name: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold },
   portionChip: { borderColor: colors.border, borderRadius: radius.pill, borderWidth: 1, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
   portionChipSelected: { backgroundColor: colors.accent, borderColor: colors.accent },
-  portionChipText: { color: colors.textMuted, fontSize: typography.small, fontWeight: '600' },
+  portionChipText: { color: colors.textMuted, fontSize: typography.small, fontFamily: fonts.medium },
   portionChipTextSelected: { color: colors.background },
   portionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   pressed: { opacity: 0.8 },

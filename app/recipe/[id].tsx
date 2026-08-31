@@ -10,7 +10,7 @@ import { useDay } from '../../src/day-context';
 import { recipes } from '../../src/data/recipes';
 import { scaleMacros } from '../../src/macros';
 import { addLogEntry, createEntryId, getFavorites, toggleFavorite } from '../../src/storage';
-import { colors, radius, spacing, typography } from '../../src/theme';
+import { colors, fonts, radius, spacing, typography } from '../../src/theme';
 import type { MealType } from '../../src/types';
 
 const servingOptions = [0.5, 1, 1.5, 2];
@@ -224,19 +224,19 @@ function MacroPill({
 
 const styles = StyleSheet.create({
   addButton: { alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.sm, padding: spacing.md },
-  addButtonText: { color: colors.background, fontSize: typography.body, fontWeight: '700' },
+  addButtonText: { color: colors.background, fontSize: typography.body, fontFamily: fonts.bold },
   addCard: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.md, padding: spacing.lg },
   addNote: { color: colors.textMuted, fontSize: typography.small, textAlign: 'center' },
-  addTitle: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
+  addTitle: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold },
   backButton: { alignSelf: 'flex-start', paddingVertical: spacing.sm },
-  backText: { color: colors.accent, fontSize: typography.body, fontWeight: '700' },
+  backText: { color: colors.accent, fontSize: typography.body, fontFamily: fonts.bold },
   content: { gap: spacing.lg },
   emptyState: { alignItems: 'center', backgroundColor: colors.background, flex: 1, gap: spacing.lg, justifyContent: 'center', padding: spacing.xl },
-  emptyTitle: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
-  eyebrow: { color: colors.accent, fontSize: typography.small, fontWeight: '800', letterSpacing: 1 },
+  emptyTitle: { color: colors.text, fontSize: typography.heading, fontFamily: fonts.bold },
+  eyebrow: { color: colors.accent, fontSize: typography.small, fontFamily: fonts.black, letterSpacing: 1 },
   headingGroup: { gap: spacing.xs },
   image: { borderRadius: radius.md, height: 210, width: '100%' },
-  ingredientAmount: { color: colors.accent, fontSize: typography.body, fontWeight: '700' },
+  ingredientAmount: { color: colors.accent, fontSize: typography.body, fontFamily: fonts.bold },
   ingredientList: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, overflow: 'hidden' },
   ingredientName: { color: colors.text, flex: 1, fontSize: typography.body },
   ingredientRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.md, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
@@ -248,20 +248,20 @@ const styles = StyleSheet.create({
   macroRow: { flexDirection: 'row', gap: spacing.sm },
   macroTextHighlighted: { color: colors.accent },
   macroUnit: { color: colors.textMuted, fontSize: typography.small },
-  macroValue: { color: colors.text, fontSize: typography.section, fontWeight: '800' },
+  macroValue: { color: colors.text, fontSize: typography.section, fontFamily: fonts.black },
   meta: { color: colors.textMuted, fontSize: typography.body },
   pressed: { opacity: 0.6 },
   section: { gap: spacing.md },
-  sectionTitle: { color: colors.text, fontSize: typography.section, fontWeight: '700' },
+  sectionTitle: { color: colors.text, fontSize: typography.section, fontFamily: fonts.bold },
   servingRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   stepList: { gap: spacing.md },
   stepNumber: { alignItems: 'center', backgroundColor: colors.accentSurface, borderRadius: radius.pill, height: 28, justifyContent: 'center', width: 28 },
-  stepNumberText: { color: colors.accent, fontSize: typography.small, fontWeight: '800' },
+  stepNumberText: { color: colors.accent, fontSize: typography.small, fontFamily: fonts.black },
   stepRow: { flexDirection: 'row', gap: spacing.md },
   stepText: { color: colors.text, flex: 1, fontSize: typography.body, lineHeight: 24 },
-  tipCard: { backgroundColor: colors.surfaceElevated, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.sm, padding: spacing.lg },
-  tipLabel: { color: colors.accent, fontSize: typography.small, fontWeight: '800', letterSpacing: 1 },
+  tipCard: { backgroundColor: colors.surfaceHigh, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.sm, padding: spacing.lg },
+  tipLabel: { color: colors.accent, fontSize: typography.small, fontFamily: fonts.black, letterSpacing: 1 },
   tipText: { color: colors.text, fontSize: typography.body, lineHeight: 24 },
-  title: { color: colors.text, fontSize: typography.heading, fontWeight: '700', lineHeight: 36 },
+  title: { color: colors.text, fontSize: typography.heading, fontFamily: fonts.bold, lineHeight: 36 },
   topRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
 });

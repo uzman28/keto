@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { verdictStyles } from '../food-meta';
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, fonts, radius, spacing, typography } from '../theme';
 import type { Food } from '../types';
 
 interface FoodTileProps {
@@ -44,13 +44,13 @@ export function FoodTile({ eyebrow, food, onPress }: FoodTileProps) {
 
 const styles = StyleSheet.create({
   badge: { alignItems: 'center', alignSelf: 'flex-start', borderRadius: radius.pill, flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs },
-  badgeText: { fontSize: typography.small, fontWeight: '800' },
+  badgeText: { fontSize: typography.small, fontFamily: fonts.black },
   carbLabel: { color: colors.textMuted, fontSize: typography.small },
   carbRow: { alignItems: 'baseline', flexDirection: 'row', gap: 2, marginTop: 'auto' },
-  carbUnit: { color: colors.textMuted, fontSize: typography.small, fontWeight: '700' },
-  carbValue: { color: colors.text, fontSize: typography.section, fontWeight: '800' },
-  eyebrow: { color: colors.accent, fontSize: typography.small, fontWeight: '800', letterSpacing: 0.8 },
-  name: { color: colors.text, fontSize: typography.body, fontWeight: '700', lineHeight: 21 },
+  carbUnit: { color: colors.textMuted, fontSize: typography.small, fontFamily: fonts.bold },
+  carbValue: { color: colors.text, fontSize: typography.section, fontFamily: fonts.black },
+  eyebrow: { color: colors.accent, fontSize: typography.small, fontFamily: fonts.black, letterSpacing: 0.8 },
+  name: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold, lineHeight: 21 },
   pressed: { opacity: 0.85 },
   tile: {
     backgroundColor: colors.surface,

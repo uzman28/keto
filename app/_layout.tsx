@@ -1,4 +1,12 @@
+import {
+  Geist_400Regular,
+  Geist_500Medium,
+  Geist_700Bold,
+  Geist_900Black,
+  useFonts,
+} from '@expo-google-fonts/geist';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
@@ -8,7 +16,29 @@ import { DayProvider } from '../src/day-context';
 import { ProfileProvider, useProfile } from '../src/profile-context';
 import { colors } from '../src/theme';
 
+// Fontlar yüklenene kadar açılış ekranı kalsın; aksi halde ilk kare sistem
+// fontuyla çizilip Geist'e atlıyor ve göze çarpan bir sıçrama oluyor.
+void SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    Geist_400Regular,
+    Geist_500Medium,
+    Geist_700Bold,
+    Geist_900Black,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      void SplashScreen.hideAsync();
+    }
+  }, [fontError, fontsLoaded]);
+
+  // Font hatasında da devam ediyoruz — sistem fontuyla açılmak, hiç açılmamaktan iyi.
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <SafeAreaProvider>
       <ProfileProvider>

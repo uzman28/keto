@@ -7,7 +7,7 @@ import { FoodRow } from '../src/components/FoodRow';
 import { Screen } from '../src/components/Screen';
 import { foods } from '../src/data/foods';
 import { categoryLabels, verdictOrder, verdictStyles } from '../src/food-meta';
-import { colors, radius, spacing, typography } from '../src/theme';
+import { colors, fonts, radius, spacing, tracking, typography } from '../src/theme';
 import type { FoodCategory, FoodVerdict } from '../src/types';
 
 type VerdictFilter = 'all' | FoodVerdict;
@@ -148,13 +148,13 @@ export default function FoodsScreen() {
 
 const styles = StyleSheet.create({
   backButton: { alignSelf: 'flex-start', paddingVertical: spacing.sm },
-  backText: { color: colors.accent, fontSize: typography.body, fontWeight: '700' },
+  backText: { color: colors.accent, fontSize: typography.body, fontFamily: fonts.bold },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   chipScrollContent: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.xl },
   chipScroller: { marginHorizontal: -spacing.xl },
   emptyText: { color: colors.textMuted, fontSize: typography.body, textAlign: 'center' },
   filterGroup: { gap: spacing.sm },
-  filterLabel: { color: colors.text, fontSize: typography.body, fontWeight: '700' },
+  filterLabel: { color: colors.text, fontSize: typography.body, fontFamily: fonts.bold },
   footnote: { color: colors.textMuted, fontSize: typography.small, lineHeight: 19 },
   headingGroup: { gap: spacing.xs },
   legend: { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.md, borderWidth: 1, gap: spacing.sm, padding: spacing.lg },
@@ -163,7 +163,13 @@ const styles = StyleSheet.create({
   legendText: { color: colors.text, fontSize: typography.small },
   list: { gap: spacing.sm },
   section: { gap: spacing.md },
-  sectionTitle: { fontSize: typography.section, fontWeight: '800' },
+  sectionTitle: { fontSize: typography.section, fontFamily: fonts.black },
   subtitle: { color: colors.textMuted, fontSize: typography.body, lineHeight: 23 },
-  title: { color: colors.text, fontSize: typography.heading, fontWeight: '700' },
+  title: {
+    color: colors.text,
+    fontFamily: fonts.black,
+    fontSize: typography.heading,
+    letterSpacing: tracking.tight,
+    textTransform: 'uppercase',
+  },
 });

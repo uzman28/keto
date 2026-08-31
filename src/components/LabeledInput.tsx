@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, fonts, radius, spacing, typography } from '../theme';
 
 interface LabeledInputProps {
   keyboardType?: 'decimal-pad' | 'default' | 'number-pad';
@@ -37,5 +37,5 @@ const styles = StyleSheet.create({
     fontSize: typography.body,
     padding: spacing.lg,
   },
-  label: { color: colors.text, fontSize: typography.body, fontWeight: '600' },
+  label: { color: colors.text, fontSize: typography.body, fontFamily: fonts.medium },
 });
