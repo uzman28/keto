@@ -1,0 +1,29 @@
+# Fly.io yapılandırması — aracı sunucu.
+#
+# ÖNEMLİ: Dağıtımdan sonra sabit giden IP almayı unutma, yoksa FatSecret
+# çağrıları reddedilir:
+#   fly ips allocate-egress -r fra
+app = 'keto-proxy'
+primary_region = 'fra'
+
+[build]
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'suspend'
+  auto_start_machines = true
+  # Sıfıra inmiyor: uyanma gecikmesi aramayı yavaşlatır ve sabit giden IP
+  # yalnızca makine ayaktayken anlamlı.
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = '10s'
+    interval = '30s'
+    method = 'GET'
+    path = '/health'
+    timeout = '5s'
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '256mb'
