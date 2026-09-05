@@ -42,8 +42,14 @@ export function RemoteFoodRow({ isExpanded, onAdd, onToggle, result }: RemoteFoo
   const [count, setCount] = useState(1);
 
   // Detay yalnızca açılınca çekiliyor — 50 sonucun tamamı için çekmek kotayı yakardı.
+  //
+  // DİKKAT: efektin içinde değiştirilen durumlar (`isLoading`, `detail`) bu
+  // listede yer ALMAMALI. Aksi halde efekt kendi kendini yeniden tetikler,
+  // önceki çalışmanın temizliği isteği iptal eder ve çark sonsuza kadar döner.
+  // Guard'daki `detail` kasıtlı olarak listede yok: açık kaldığı sürece efekt
+  // yeniden çalışmıyor, kapanıp açılınca zaten tazelenmiş kapanışla geliyor.
   useEffect(() => {
-    if (!isExpanded || detail || isLoading) {
+    if (!isExpanded || detail) {
       return;
     }
 
@@ -66,7 +72,8 @@ export function RemoteFoodRow({ isExpanded, onAdd, onToggle, result }: RemoteFoo
       });
 
     return () => controller.abort();
-  }, [detail, isExpanded, isLoading, result.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpanded, result.id]);
 
   const summary = result.summary;
   const portion = detail?.portions[portionIndex] ?? detail?.portions[0];
